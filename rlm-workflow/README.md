@@ -1,5 +1,11 @@
 # RLM Workflow Skill
 
+## 0. How to install
+
+```bash
+npx skills add https://github.com/doubleuuser/rlm-workflow --skill rlm-workflow
+```
+
 ## 1. Introduction to RLM-workflow skill
 
 `rlm-workflow` is a Codex skill for running the repository's RLM (Repo-Document Workflow) with strict phase gates, traceability, locking, and addenda rules.
