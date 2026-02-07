@@ -1,4 +1,4 @@
 interface:
   display_name: "RLM Workflow"
-  short_description: "Run repo-doc RLM phases with strict stage gates"
-  default_prompt: "Use the repository RLM workflow in .agent/PLANS.md and .codex/AGENTS.md to execute the requested phase with required gates and artifact locking."
+  short_description: "Run repo-doc RLM phases with strict sequential stage gates"
+  default_prompt: "Use the repository RLM workflow in .agent/PLANS.md and .codex/AGENTS.md to execute the requested phase with required gates, strict sequential phase isolation, and artifact locking."

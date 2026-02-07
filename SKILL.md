@@ -44,7 +44,7 @@ The script performs installation-time setup:
   - On `Implement requirement '<run-id>'`, resolve run folder and execute phases sequentially.
   - Pause only for manual QA sign-off in Phase 6.
 - Single-phase mode:
-  - On `Run RLM Phase N`, execute only that phase and write only that phase outputs.
+  - On `Run RLM Phase N`, execute only that phase and write only that phase outputs, but only when all required earlier phases are lock-valid.
 
 ## Single-Command Contract (Mandatory)
 
@@ -59,6 +59,24 @@ The script performs installation-time setup:
   - Write `05-manual-qa.md` with scenarios in `DRAFT`.
   - Pause and request user results/sign-off.
   - On next invocation, record results, lock Phase 6, then continue to Phase 7 and 8.
+
+## Phase Transition Guardrail (Mandatory, Hard Stop)
+
+- Before starting Phase `N`, validate the lock chain for all prior phases (`2..N-1`) using `.agent/PLANS.md`.
+- A prior phase is considered lock-valid only when its base artifact and phase-local addenda are `LOCKED`, include `LockedAt` and `LockHash`, and end with `Coverage: PASS` and `Approval: PASS`.
+- If any prior phase is not lock-valid, do not create or update later-phase artifacts.
+- Resume the earliest failing phase and repair it until lock-valid, then continue.
+- Never start Phase 7 or 8 unless `05-manual-qa.md` is lock-valid.
+- The only intentional pause is Manual QA in Phase 6; all other pauses are blockers.
+
+## Sequential Phase Isolation (Mandatory, No Parallel Phase Work)
+
+- The workflow is strictly sequential: exactly one active phase per run at any time.
+- Active phase = the earliest phase whose base artifact is missing or not lock-valid.
+- Do not create, update, or lock artifacts for any later phase while the active phase is unresolved.
+- Never keep more than one phase base artifact in `DRAFT` at the same time.
+- If multiple phase artifacts are `DRAFT`, treat only the earliest `DRAFT` phase as active; later `DRAFT` artifacts are invalid parallel prework and must not be continued until the active phase is lock-valid.
+- After the active phase is lock-valid, continue sequentially and recreate/overwrite any invalid later-phase `DRAFT` artifacts only when those phases become active.
 
 ## Run Folder and Artifacts
 
@@ -102,6 +120,8 @@ Always enforce these sections from `.agent/PLANS.md` when applicable:
 - `RLM single-command orchestration ("Implement requirement '<run-id>'")`
 - `Run folder resolution`
 - `Phase auto-resume and phase selection`
+- `Phase transition hard-stop lock chain (required)`
+- `Strict sequential phase execution (no parallel phase work)`
 - `Manual QA stop (the only intentional pause)`
 - `Locking rules for single-command execution`
 

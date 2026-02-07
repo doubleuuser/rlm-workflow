@@ -32,14 +32,16 @@ This guide is intentionally prescriptive so two different agents produce equival
 ## Quick Start Checklist
 
 1. Resolve the run id and exact output path.
-2. Determine effective inputs:
+2. If writing Phase 3 or later, verify all prior phase artifacts are lock-valid before proceeding.
+3. Verify phase isolation: only the current phase may be `DRAFT`; do not proceed if a prior phase is unresolved.
+4. Determine effective inputs:
    - base input files for this phase
    - plus stage-local addenda for each base input, lexical order
-3. Write the required header with exact input/output paths.
-4. Write phase-specific content sections from this guide.
-5. Write `Traceability`, `Coverage Gate`, and `Approval Gate`.
-6. Keep `Status: DRAFT` while iterating.
-7. Lock only after both gates pass (`Status`, `LockedAt`, `LockHash`).
+5. Write the required header with exact input/output paths.
+6. Write phase-specific content sections from this guide.
+7. Write `Traceability`, `Coverage Gate`, and `Approval Gate`.
+8. Keep `Status: DRAFT` while iterating.
+9. Lock only after both gates pass (`Status`, `LockedAt`, `LockHash`).
 
 ## Required Header (All Artifacts)
 

@@ -784,6 +784,63 @@ Whenever the orchestrator reads a phase input artifact, it must treat the effect
 
 The orchestrator must list all effective inputs in the header of each output artifact under Inputs.
 
+### Phase transition hard-stop lock chain (required)
+
+Before the orchestrator starts or resumes Phase `N` (`N >= 3`), it must validate that every required prior phase is lock-valid.
+
+Required prior artifacts by phase:
+
+- Phase 2: `01-as-is.md`
+- Phase 3: `02-to-be-plan.md`
+- Phase 4: `03-implementation-summary.md`
+- Phase 5: `04-test-summary.md`
+- Phase 6: `05-manual-qa.md`
+
+A phase artifact is lock-valid only if all checks pass:
+
+1) The base artifact file exists.
+2) The header contains `Status: LOCKED`.
+3) The header contains non-empty `LockedAt`.
+4) The header contains non-empty `LockHash`.
+5) The artifact ends with `Coverage: PASS` and `Approval: PASS`.
+6) Any stage-local addenda for that phase (`addenda/<base>.addendum-*.md`) also satisfy checks 1-5.
+
+If any lock-valid check fails for a required prior phase:
+
+- Do not create, edit, or lock any later-phase artifact.
+- Resume the earliest failing phase and iterate until it is lock-valid.
+- Report the blocking file path(s) and failed check(s) in the phase notes/output.
+
+Forbidden phase transitions:
+
+- Do not create `02-to-be-plan.md` unless `01-as-is.md` is lock-valid.
+- Do not create `03-implementation-summary.md` unless `02-to-be-plan.md` is lock-valid.
+- Do not create `04-test-summary.md` unless `03-implementation-summary.md` is lock-valid.
+- Do not create or complete `05-manual-qa.md` unless `04-test-summary.md` is lock-valid.
+- Do not start Phase 7 or Phase 8 unless `05-manual-qa.md` is lock-valid.
+
+This hard-stop chain applies in single-command mode and single-phase mode.
+
+### Strict sequential phase execution (no parallel phase work)
+
+RLM phase execution is strictly sequential within a run. Parallel phase work is forbidden.
+
+Rules:
+
+1) Exactly one active phase per run at any time.
+2) The active phase is the earliest phase whose base artifact is missing or not lock-valid.
+3) While the active phase is unresolved, the agent must not create, edit, or lock artifacts for later phases.
+4) There must never be more than one phase base artifact in `DRAFT` simultaneously.
+
+If multiple phase artifacts are found in `DRAFT`:
+
+- Treat the earliest `DRAFT` phase as the only active phase.
+- Treat later `DRAFT` phase artifacts as invalid parallel prework.
+- Do not continue later `DRAFT` artifacts until the active phase becomes lock-valid.
+- Once the active phase locks, proceed in sequence and recreate/overwrite invalid later-phase `DRAFT` artifacts only when each phase becomes active.
+
+This rule applies to single-command orchestration and explicit single-phase invocations.
+
 ### Mandatory gates
 
 For each phase artifact created or updated, the orchestrator must enforce:

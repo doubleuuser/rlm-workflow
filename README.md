@@ -70,7 +70,7 @@ Currently, the workflow asks for manual verification at the QA phase. If you wan
 
 Optional phase-specific control:
    - Example: `Run RLM Phase 3 for 00-my-first-requirements`
-   - What it does: executes only one selected phase.
+   - What it does: executes only one selected phase, but still enforces sequential lock-chain rules.
    - User input required: Depends on phase (manual input required at Phase 6 only).
 
 ## 4. What it does
@@ -80,6 +80,8 @@ Optional phase-specific control:
 - Applies effective-input processing (base artifact + addenda).
 - Produces traceability mappings from `R#` to evidence.
 - Locks artifacts only when gates pass, with `LockedAt` and `LockHash`.
+- Enforces hard-stop phase transition checks so later phases cannot run unless prior phases are lock-valid.
+- Enforces strict phase isolation: only one active/DRAFT phase is allowed per run.
 - Handles manual QA pause/resume behavior for Phase 6.
 
 ## 5. How it does it
@@ -88,6 +90,8 @@ Optional phase-specific control:
 - Runs single-command orchestration with auto-resume:
   - resume incomplete phases
   - create missing next-phase artifacts
+  - block any phase advancement when prior artifacts are not lock-valid
+  - forbid parallel phase work (no multi-phase DRAFT state)
   - never modify locked prior-phase artifacts
 - Uses stage-local and upstream-gap addenda to preserve immutability while handling new findings.
 - Uses `references/artifact-template.md` as the artifact-writing standard.
