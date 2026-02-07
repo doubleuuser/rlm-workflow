@@ -89,3 +89,48 @@ Currently, the workflow asks for manual verification at the QA phase. If you wan
   - never modify locked prior-phase artifacts
 - Uses stage-local and upstream-gap addenda to preserve immutability while handling new findings.
 - Uses `references/artifact-template.md` as the artifact-writing standard.
+
+## 6. How to modify the workflow
+
+Below are common customizations and exactly which file(s) to edit for each.
+
+1. Change trigger phrases or when the skill should activate.
+   - Edit: `SKILL.md` (frontmatter `description`)
+   - Optional: `agents/openai.yaml` (`default_prompt`, `short_description`)
+
+2. Change phase behavior (for example, require an extra approval pause in Phase 3).
+   - Edit: `SKILL.md` (single-command contract and phase rules)
+   - Edit: `references/artifact-template.md` (gates/checklists to match the new rule)
+
+3. Change artifact format or required sections.
+   - Edit: `references/artifact-template.md` (headers, traceability, gate templates)
+   - Edit: `SKILL.md` (phase execution protocol and expectations)
+
+4. Change run folder structure or artifact file names.
+   - Edit: `SKILL.md` (run folder and artifact paths)
+   - Edit: `references/artifact-template.md` (all template paths)
+   - Edit: `scripts/install-rlm-workflow.ps1` (scaffold and inserted path references)
+
+5. Change what gets inserted into `.codex/AGENTS.md` and `.agent/PLANS.md`.
+   - Edit: `scripts/install-rlm-workflow.ps1` (`$agentsBlock`, `$plansBlock`)
+
+6. Add or change global artifacts beyond `DECISIONS.md` and `STATE.md`.
+   - Edit: `SKILL.md` (global artifacts + phase expectations)
+   - Edit: `scripts/install-rlm-workflow.ps1` (create/ensure those files)
+   - Edit: `references/artifact-template.md` (if new required sections are needed)
+
+7. Change testing policy (TDD depth, Playwright tagging, tier commands).
+   - Edit: `SKILL.md` (mandatory PLANS sections to enforce)
+   - Edit: `references/artifact-template.md` (test summary and plan template sections)
+   - Edit in target repo: `.agent/PLANS.md` (canonical testing rules)
+
+8. Change how installation/setup works.
+   - Edit: `scripts/install-rlm-workflow.ps1`
+   - Edit: `README.md` (installation instructions)
+   - Edit: `SKILL.md` (Install Bootstrap section)
+
+9. Update end-user documentation and examples.
+   - Edit: `README.md`
+
+10. Keep inserted AGENTS skills index in sync after edits.
+   - Run in target repo: `powershell -ExecutionPolicy Bypass -File .codex/scripts/update-agents-skills.ps1`
