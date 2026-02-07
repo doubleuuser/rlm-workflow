@@ -91,6 +91,8 @@ Write-Output "[INFO] Repo root: $resolvedRepoRoot"
 $codexDir = Join-Path $resolvedRepoRoot ".codex"
 $agentDir = Join-Path $resolvedRepoRoot ".agent"
 $rlmDir = Join-Path $codexDir "rlm"
+$skillRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
+$canonicalPlansPath = Join-Path $skillRoot "references\plans-canonical.md"
 $agentsPath = Join-Path $codexDir "AGENTS.md"
 $decisionsPath = Join-Path $codexDir "DECISIONS.md"
 $statePath = Join-Path $codexDir "STATE.md"
@@ -118,6 +120,16 @@ Ensure-File -Path $statePath -Content @"
 Ensure-File -Path $agentsPath -Content @"
 # AGENTS.md
 "@
+if (Test-Path -LiteralPath $canonicalPlansPath) {
+  $seedPlans = Get-Content -LiteralPath $canonicalPlansPath -Raw -Encoding UTF8
+  if (-not [string]::IsNullOrWhiteSpace($seedPlans)) {
+    Ensure-File -Path $plansPath -Content ($seedPlans.TrimEnd("`r", "`n") + "`r`n")
+  } else {
+    Ensure-File -Path $plansPath -Content "## Canonical location`r`n"
+  }
+} else {
+  Ensure-File -Path $plansPath -Content "## Canonical location`r`n"
+}
 
 $agentsBlock = @(
   '## RLM Workflow Skill',
@@ -143,21 +155,22 @@ Upsert-MarkedBlock `
   -BlockBody $agentsBlock
 
 if (-not $SkipPlansUpdate) {
-  if (Test-Path -LiteralPath $plansPath) {
-    $plansBlock = @(
-      "## RLM Skill Integration",
-      "",
-      "The rlm-workflow skill operationalizes this document's RLM rules during execution.",
-      "Use it for RLM-triggered prompts such as Implement requirement 'run-id' and phase-specific commands."
-    ) -join "`r`n"
-
-    Upsert-MarkedBlock `
-      -FilePath $plansPath `
-      -StartMarker "<!-- RLM-WORKFLOW-SKILL:START -->" `
-      -EndMarker "<!-- RLM-WORKFLOW-SKILL:END -->" `
-      -BlockBody $plansBlock
+  if (Test-Path -LiteralPath $canonicalPlansPath) {
+    $plansBlock = Get-Content -LiteralPath $canonicalPlansPath -Raw -Encoding UTF8
+    if (-not [string]::IsNullOrWhiteSpace($plansBlock)) {
+      $normalizedCanonical = $plansBlock.TrimEnd("`r", "`n") + "`r`n"
+      $existingPlans = Get-Content -LiteralPath $plansPath -Raw -Encoding UTF8
+      if ($existingPlans -ne $normalizedCanonical) {
+        Write-Utf8NoBom -Path $plansPath -Content $normalizedCanonical
+        Write-Output "[OK] Synced .agent/PLANS.md from canonical template: $canonicalPlansPath"
+      } else {
+        Write-Output "[OK] File already up to date: $plansPath"
+      }
+    } else {
+      Write-Output "[INFO] Skipped PLANS update: canonical plans file is empty at $canonicalPlansPath"
+    }
   } else {
-    Write-Output "[INFO] Skipped PLANS update: file not found at $plansPath"
+    Write-Output "[INFO] Skipped PLANS update: canonical plans file not found at $canonicalPlansPath"
   }
 } else {
   Write-Output "[INFO] Skipped PLANS update by configuration."

@@ -102,6 +102,7 @@ Below are common customizations and exactly which file(s) to edit for each.
 
 2. Change phase behavior (for example, require an extra approval pause in Phase 3).
    - Edit: `SKILL.md` (single-command contract and phase rules)
+   - Edit: `references/plans-canonical.md` (full canonical PLANS text that gets upserted on install)
    - Edit: `references/artifact-template.md` (gates/checklists to match the new rule)
 
 3. Change artifact format or required sections.
@@ -114,7 +115,8 @@ Below are common customizations and exactly which file(s) to edit for each.
    - Edit: `scripts/install-rlm-workflow.ps1` (scaffold and inserted path references)
 
 5. Change what gets inserted into `.codex/AGENTS.md` and `.agent/PLANS.md`.
-   - Edit: `scripts/install-rlm-workflow.ps1` (`$agentsBlock`, `$plansBlock`)
+   - Edit: `scripts/install-rlm-workflow.ps1` (`$agentsBlock` and PLANS upsert markers/settings)
+   - Edit: `references/plans-canonical.md` (the full PLANS content that is inserted)
 
 6. Add or change global artifacts beyond `DECISIONS.md` and `STATE.md`.
    - Edit: `SKILL.md` (global artifacts + phase expectations)
@@ -130,6 +132,7 @@ Below are common customizations and exactly which file(s) to edit for each.
    - Edit: `scripts/install-rlm-workflow.ps1`
    - Edit: `README.md` (installation instructions)
    - Edit: `SKILL.md` (Install Bootstrap section)
+   - Note: installer guarantees `.agent/PLANS.md` exists after installation.
 
 9. Update end-user documentation and examples.
    - Edit: `README.md`

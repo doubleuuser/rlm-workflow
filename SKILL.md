@@ -19,10 +19,11 @@ powershell -ExecutionPolicy Bypass -File .agents/skills/rlm-workflow/scripts/ins
 
 The script performs installation-time setup:
 - Creates `.codex/rlm/` scaffold (`.codex/rlm/.gitkeep`) and required global files if missing.
+- Guarantees `.agent/PLANS.md` exists after installation.
 - Adds explicit RLM workflow references to `.codex/AGENTS.md`.
 - Explicitly inserts: `Triggers on RLM requests like Implement requirement 'run-id' and phase-specific commands.`
 - Refreshes the auto-generated installed skills section when `.codex/scripts/update-agents-skills.ps1` exists.
-- Upserts a small skill integration block in `.agent/PLANS.md` by default (skip with `-SkipPlansUpdate`).
+- Upserts full canonical RLM workflow content into `.agent/PLANS.md` from `references/plans-canonical.md` (skip with `-SkipPlansUpdate`).
 
 ## Read Order
 
