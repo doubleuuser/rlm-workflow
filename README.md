@@ -32,42 +32,44 @@ Currently, the workflow asks for manual verification at the QA phase. If you wan
 
 ## 3. How to use it
 
-1. Install/discover the skill in your environment.
-2. Install with:
+1. Install with:
    - `npx skills add https://github.com/doubleuuser/rlm-workflow --skill rlm-workflow`
-3. Create a run folder and Phase 1 requirements artifact:
+2. Create a run folder and Phase 1 requirements artifact:
    - Path: `.codex/rlm/<run-id>/00-requirements.md`
-   - What it does: defines `R#` requirements, acceptance criteria, `OOS#`, constraints.
-   - User input required: Yes (the user must provide the requirement intent and acceptance criteria).
-4. Invoke execution:
+   - Example: I create the folder for my first requirements as: /rlm/00-my-first-requirements
+   - I then create the requirements doc inside the same folder: /00-my-first-requirements/00-requirements.md
+   - Ideally, these requirements should be fleshed out with an agent beforehand, but they can also be simple ("add a button to delete these feed items"), and the agent will flesh out the requirements for you as part of the workflow.
+3. Invoke execution:
    - `Implement requirement '<run-id>'`
-   - What it does: runs/resumes phases automatically in order.
+   - Example: `Implement requirement 00-my-first-requirements`
+   - What it does: runs/resumes phases automatically in order. The requirements doc will be read and formatted according to workflow rules.
    - User input required: No (until manual QA phase).
-5. Phase 2 (`01-as-is.md`) - AS-IS analysis:
+4. Phase 2 (`01-as-is.md`) - AS-IS analysis:
    - What it does: captures current behavior, repro steps, code pointers, known unknowns.
    - User input required: Usually no.
-6. Phase 3 (`02-to-be-plan.md`) - TO-BE plan:
+5. Phase 3 (`02-to-be-plan.md`) - TO-BE plan:
    - What it does: creates an ExecPlan-grade implementation + validation plan (including tests and manual QA scenarios).
    - User input required: Usually no, unless the user wants to refine scope/tradeoffs.
-7. Phase 4 (`03-implementation-summary.md`) - Implementation:
+6. Phase 4 (`03-implementation-summary.md`) - Implementation:
    - What it does: applies planned code changes and records what changed and why.
    - User input required: No.
-8. Phase 5 (`04-test-summary.md`) - Tests and validation:
+7. Phase 5 (`04-test-summary.md`) - Tests and validation:
    - What it does: runs planned validation and records commands/results/evidence.
    - User input required: No.
-9. Phase 6 (`05-manual-qa.md`) - Manual QA sign-off:
+8. Phase 6 (`05-manual-qa.md`) - Manual QA sign-off:
    - What it does: pauses for human QA execution and records observed results.
    - User input required: Yes (the user must run QA scenarios and provide sign-off or failure notes).
-10. Phase 7 - Global decisions update:
+9. Phase 7 - Global decisions update:
    - Artifact updated: `.codex/DECISIONS.md`
    - What it does: records what changed, why, and references all run artifacts.
    - User input required: No.
-11. Phase 8 - Global state update:
+10. Phase 8 - Global state update:
    - Artifact updated: `.codex/STATE.md`
    - What it does: updates current system state to reflect the final implemented behavior.
    - User input required: No.
-12. Optional phase-specific control:
-   - Example: `Run RLM Phase 3 for .codex/rlm/<run-id>/`
+
+Optional phase-specific control:
+   - Example: `Run RLM Phase 3 for 00-my-first-requirements`
    - What it does: executes only one selected phase.
    - User input required: Depends on phase (manual input required at Phase 6 only).
 
