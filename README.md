@@ -20,8 +20,8 @@ npx skills add https://github.com/doubleuuser/rlm-workflow --skill rlm-workflow
 ## 3. How to use it
 
 1. Install/discover the skill in your environment.
-2. Run the bootstrap script in the target repo:
-   - `powershell -ExecutionPolicy Bypass -File .agents/skills/rlm-workflow/scripts/install-rlm-workflow.ps1 -RepoRoot .`
+2. Install with:
+   - `npx skills add https://github.com/doubleuuser/rlm-workflow --skill rlm-workflow`
 3. Start or continue work with short commands such as:
    - `Implement requirement '<run-id>'`
    - `Run RLM Phase 3 for .codex/rlm/<run-id>/`
