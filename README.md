@@ -1,4 +1,4 @@
-# RLM Workflow Skill
+# RLM Workflow Skill for Codex
 
 ## 0. How to install
 
