@@ -1,6 +1,6 @@
 ---
 name: rlm-workflow
-description: Execute this repository's RLM (Repo-Document Workflow) end-to-end with strict phase gates, artifact locking, addenda, and traceability. Use when a request mentions "Implement requirement run-id", asks to run a specific RLM phase, requires creating or updating files in .codex/rlm/run-id/, or needs an ExecPlan-grade phase 3 plan under .agent/PLANS.md.
+description: Execute this repository's RLM (Repo-Document Workflow) end-to-end with strict phase gates, artifact locking, addenda, traceability, and single-command auto-resume behavior. Use when a request mentions "Implement requirement run-id", asks to run a specific RLM phase, requires creating or updating files in .codex/rlm/run-id/, needs an ExecPlan-grade phase 3 plan under .agent/PLANS.md, or asks to continue a paused run after manual QA.
 ---
 
 # RLM Workflow
@@ -45,6 +45,20 @@ The script performs installation-time setup:
 - Single-phase mode:
   - On `Run RLM Phase N`, execute only that phase and write only that phase outputs.
 
+## Single-Command Contract (Mandatory)
+
+- Resolve run folder at `.codex/rlm/<run-id>/`.
+- If run folder or `00-requirements.md` is missing, stop and ask for it. Do not invent requirements.
+- Auto-resume from current state:
+  - If a phase artifact exists as `DRAFT` or with failing gates, resume that phase.
+  - If a phase artifact is missing, create it for the next phase in sequence.
+  - Never back-edit locked prior-phase artifacts.
+- Execute in order: Phase 2 through Phase 8.
+- For Phase 6:
+  - Write `05-manual-qa.md` with scenarios in `DRAFT`.
+  - Pause and request user results/sign-off.
+  - On next invocation, record results, lock Phase 6, then continue to Phase 7 and 8.
+
 ## Run Folder and Artifacts
 
 - Primary run path: `.codex/rlm/<run-id>/`
@@ -76,6 +90,19 @@ The script performs installation-time setup:
    - Add `LockHash` (SHA-256 of the file content)
 
 Use `references/artifact-template.md` for exact header and gate scaffolding.
+
+## Mandatory PLANS Sections to Enforce
+
+Always enforce these sections from `.agent/PLANS.md` when applicable:
+
+- `Large requirements: Implementation sub-phases (required when scope is large or risky)`
+- `Playwright tagging for RLM runs and implementation sub-phases (required)`
+- `Testing discipline (TDD + Playwright)` sections for Phase 3, 4, and 5
+- `RLM single-command orchestration ("Implement requirement '<run-id>'")`
+- `Run folder resolution`
+- `Phase auto-resume and phase selection`
+- `Manual QA stop (the only intentional pause)`
+- `Locking rules for single-command execution`
 
 ## Immutability and Addenda
 
