@@ -61,40 +61,6 @@ rlm-workflow is inspired by the MIT paper 'Recursive Language Models'. While the
 
 rlm-workflow uses a standard kanban-workflow with distinct phases like requirements, codebase analysis, implementation plan, implementation summary, verification, manual QA of implementation, and then updating of global repo artifacts (STATE.md and DECISIONS.md) to document the codebase.
 
-## Core Enhancements
-
-### Phase 1: Quality & Discipline
-1. **TDD Discipline (Phase 3)** - Strict RED-GREEN-REFACTOR cycle with The Iron Law: *No production code without a failing test first*
-2. **Systematic Debugging (Phase 1.5)** - Optional debug mode for bug fixes with 4-phase root cause analysis
-3. **Rationalization Awareness** - Common excuse/reality tables to prevent corner-cutting
-4. **TODO Discipline (All Phases)** - Mandatory checkable TODOs in every phase artifact; no locking with unchecked items
-
-### Phase 3: Multi-Platform Support
-5. **Claude Code Plugin** - Native plugin with marketplace support
-6. **OpenCode Plugin** - JavaScript plugin with custom tools
-7. **Cursor Plugin** - IDE plugin with commands and keybindings
-
-### Phase 2: Parallelization & Review
-8. **Subagent-Driven Execution** - Automatic parallel execution with fallback to sequential mode
-9. **Phase 3.5 Code Review** - Optional subagent review between implementation and testing
-10. **Parallel Testing** - Concurrent test execution (unit, integration, E2E)
-
-### Phase 4: Isolation & Safety
-11. **Git Worktree Phase 0** - Isolated workspace setup (REQUIRED before other phases)
-12. **Branch Protection** - Prevents main branch work without explicit consent
-13. **Lock Verification** - Automated SHA-256 hash validation
-
-### Methodology Enhancements
-14. **Skill Priority System** - When multiple concerns apply, use priority order (Debugging → Design → Implementation → Testing → Review)
-15. **Hard Gates** - Non-negotiable checkpoints marked with `<HG>` tags prevent skipping steps
-16. **Execution Modes** - Automatic detection of parallel vs sequential based on subagent capability
-
-Each phase takes the previous phases' output docs as input, and outputs one markdown file of its own. When a phase is done, the artifact is locked with a hash to prevent drift.
-
-The phases can easily be customized by editing the SKILL.md doc. 
-
-Currently, the workflow asks for manual verification at the QA phase. If you want it to wait for permission at other stages, like the TO-BE implementation plan, before continuing, you can easily add that to the SKILL.md doc.
-
 ## 2. Why use it
 
 - It keeps requirements and plans in repo files instead of chat context.
@@ -105,6 +71,25 @@ Currently, the workflow asks for manual verification at the QA phase. If you wan
 - It **isolates development** via git worktrees, preventing main branch pollution.
 - It **protects the main branch** by requiring explicit consent to work directly on it.
 - All historical implementations, including Why, What and How, can easily be audited in the .codex/rlm/ folder where each requirement has its own folder with locked artifacts per phase.
+
+### Key Features
+
+**Quality & Discipline**
+- **TDD Discipline** - Strict RED-GREEN-REFACTOR cycle with The Iron Law: *No production code without a failing test first*
+- **Systematic Debugging** - Optional Phase 1.5 debug mode for bug fixes with 4-phase root cause analysis
+- **TODO Discipline** - Mandatory checkable TODOs in every phase artifact; no locking with unchecked items
+- **Rationalization Awareness** - Common excuse/reality tables to prevent corner-cutting
+
+**Execution & Scaling**
+- **Subagent-Driven Execution** - Automatic parallel execution with fallback to sequential mode
+- **Phase 3.5 Code Review** - Optional subagent review between implementation and testing
+- **Parallel Testing** - Concurrent test execution (unit, integration, E2E)
+
+**Safety & Control**
+- **Git Worktree Isolation** - Isolated workspace setup (REQUIRED before other phases)
+- **Branch Protection** - Prevents main branch work without explicit consent
+- **Lock Verification** - Automated SHA-256 hash validation
+- **Hard Gates** - Non-negotiable checkpoints marked with `<HG>` tags prevent skipping steps
 
 ## 3. How to use it
 
@@ -404,8 +389,8 @@ Below are common customizations and exactly which file(s) to edit for each.
 
 8. Change systematic debugging process (Phase 1.5).
    - Edit: `skills/rlm-debugging/SKILL.md` (debugging methodology)
-   - Edit: `references/plans-canonical.md` (Phase 2.5 integration)
-   - Edit: `references/artifact-template.md` (Phase 2.5 template)
+   - Edit: `references/plans-canonical.md` (Phase 1.5 integration)
+   - Edit: `references/artifact-template.md` (Phase 1.5 template)
 
 9. Change rationalization tables.
    - Edit: `references/rationalizations.md` (excuse/reality tables)
