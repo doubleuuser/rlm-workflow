@@ -176,8 +176,4 @@ if (-not $SkipPlansUpdate) {
   Write-Output "[INFO] Skipped PLANS update by configuration."
 }
 
-# Note: If a unified skills indexer exists in this skill package, invoke it here.
-# $updateSkillsScript = Join-Path $skillRoot "scripts/update-agents-skills.ps1"
-# if (Test-Path -LiteralPath $updateSkillsScript) { ... }
-
 Write-Output "[OK] RLM workflow installation bootstrap complete."

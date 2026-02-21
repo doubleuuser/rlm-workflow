@@ -1,7 +1,0 @@
-{
-  "session-start": {
-    "command": "hooks/session-start.sh",
-    "async": false,
-    "description": "Bootstrap RLM workflow context at session start"
-  }
-}

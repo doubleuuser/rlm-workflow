@@ -61,7 +61,7 @@ Each subagent (implementer, code-reviewer) MUST:
 ## TODO
 
 - [ ] Read original plan (Phase 3)
-- [ ] Read implementation summary (Phase 4)
+- [ ] Read implementation summary (Phase 3)
 - [ ] Review git diff (BASE_SHA..HEAD_SHA)
 - [ ] Verify plan alignment
 - [ ] Assess code quality
@@ -118,7 +118,7 @@ await Promise.all([
 
 ### Phase 3.5: Code Review Subagent
 
-**Trigger:** After Phase 4 implementation
+**Trigger:** After Phase 3 implementation
 **Action:** Dispatch `agents/code-reviewer.md` subagent with:
 - BASE_SHA and HEAD_SHA of changes
 - Phase 3 plan for alignment check
