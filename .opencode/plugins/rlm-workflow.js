@@ -20,7 +20,7 @@ const __dirname = dirname(__filename);
 const PLUGIN_ID = 'rlm-workflow';
 const PLUGIN_VERSION = '2.0.0';
 const PLUGIN_NAME = 'RLM Workflow';
-const PLUGIN_DESCRIPTION = 'Repo-Document Workflow with strict phase gates, TDD discipline, and systematic debugging';
+const PLUGIN_DESCRIPTION = 'Recursive Language Models workflow with strict phase gates, TDD discipline, and systematic debugging';
 
 /**
  * Extract YAML frontmatter from a skill file

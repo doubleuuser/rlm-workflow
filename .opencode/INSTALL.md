@@ -31,11 +31,7 @@ Add to your OpenCode configuration (usually `~/.config/opencode/config.json`):
 }
 ```
 
-Or use the OpenCode CLI:
-
-```bash
-opencode plugin add ~/.config/opencode/skills/rlm-workflow/.opencode/plugins/rlm-workflow.js
-```
+**Note:** OpenCode does not have a CLI command for plugin installation. You must manually edit the config file.
 
 ### Step 3: Restart OpenCode
 
@@ -147,12 +143,9 @@ Then restart OpenCode.
 ## Uninstallation
 
 ```bash
-# Remove plugin from config
-opencode plugin remove rlm-workflow
+# 1. Remove plugin entry from ~/.config/opencode/config.json
 
-# Or manually edit ~/.config/opencode/config.json
-
-# Remove files
+# 2. Remove files
 rm -rf ~/.config/opencode/skills/rlm-workflow
 ```
 

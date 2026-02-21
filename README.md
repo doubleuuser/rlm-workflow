@@ -13,45 +13,118 @@ A multi-platform Recursive Language Models (RLM) workflow for AI-assisted softwa
 
 ## Installation
 
-### Codex (Primary)
+### Universal Installation (All Platforms)
 
 ```bash
+# Clone to your preferred skills directory
+git clone https://github.com/doubleuuser/rlm-workflow.git
+
+# Then copy/symlink to your agent's skills directory (see platform-specific paths below)
+```
+
+### Platform-Specific Paths
+
+| Platform | Skills Directory | Installation Method |
+|----------|------------------|---------------------|
+| **Codex** | `.agents/skills/` or `~/.config/agents/skills/` | `npx skills add` or manual clone |
+| **Claude Code** | `~/.claude/skills/` or `.claude/skills/` | Manual clone + symlink |
+| **OpenCode** | `~/.config/opencode/skills/` | Manual clone + config edit |
+| **Cursor** | `~/.cursor/extensions/` or `.cursor/extensions/` | Manual clone |
+
+### Quick Setup Script
+
+```bash
+# 1. Clone the repository
+REPO_URL="https://github.com/doubleuuser/rlm-workflow.git"
+SKILL_NAME="rlm-workflow"
+
+# 2. Detect platform and install to appropriate directory
+if [ -d "$HOME/.config/agents” ]; then
+  # Codex
+  TARGET="$HOME/.config/agents/skills/$SKILL_NAME"
+elif [ -d "$HOME/.claude” ]; then
+  # Claude Code
+  TARGET="$HOME/.claude/skills/$SKILL_NAME"
+elif [ -d "$HOME/.config/opencode” ]; then
+  # OpenCode
+  TARGET="$HOME/.config/opencode/skills/$SKILL_NAME"
+elif [ -d "$HOME/.cursor” ]; then
+  # Cursor
+  TARGET="$HOME/.cursor/extensions/$SKILL_NAME"
+else
+  # Default to current directory
+  TARGET="./$SKILL_NAME"
+fi
+
+# 3. Clone or update
+git clone "$REPO_URL" "$TARGET" 2>/dev/null || (cd "$TARGET" && git pull)
+
+echo "Installed to: $TARGET"
+```
+
+### Manual Installation by Platform
+
+#### Codex
+```bash
+# Option 1: Using npx (if available)
 npx skills add https://github.com/doubleuuser/rlm-workflow --skill rlm-workflow
+
+# Option 2: Manual clone
+mkdir -p .agents/skills
+git clone https://github.com/doubleuuser/rlm-workflow.git .agents/skills/rlm-workflow
 ```
 
-### Claude Code
-
+#### Claude Code
 ```bash
-# Add marketplace
-/plugin marketplace add doubleuuser/rlm-workflow-marketplace
+# Clone to Claude Code skills directory
+mkdir -p ~/.claude/skills
+git clone https://github.com/doubleuuser/rlm-workflow.git ~/.claude/skills/rlm-workflow
 
-# Install plugin
-/plugin install rlm-workflow@rlm-workflow-marketplace
+# Or use the plugin files in .claude-plugin/ directory
 ```
 
-### OpenCode
-
+#### OpenCode
 ```bash
-# Clone to skills directory
+# Clone to OpenCode skills directory
 mkdir -p ~/.config/opencode/skills
 git clone https://github.com/doubleuuser/rlm-workflow.git ~/.config/opencode/skills/rlm-workflow
 
-# Enable plugin in config
-opencode plugin add ~/.config/opencode/skills/rlm-workflow/.opencode/plugins/rlm-workflow.js
+# Add to ~/.config/opencode/config.json:
+# {
+#   "plugins": [
+#     {
+#       "id": "rlm-workflow",
+#       "path": "~/.config/opencode/skills/rlm-workflow/.opencode/plugins/rlm-workflow.js"
+#     }
+#   ]
+# }
 ```
 
-See `.opencode/INSTALL.md` for detailed instructions.
+#### Cursor
+```bash
+# Clone to Cursor extensions directory
+mkdir -p ~/.cursor/extensions
+git clone https://github.com/doubleuuser/rlm-workflow.git ~/.cursor/extensions/rlm-workflow
 
-### Cursor
-
-1. Open Cursor → Settings → Plugins
-2. Search "RLM Workflow"
-3. Click Install
-
-Or use the command palette:
+# Or manually copy .cursor-plugin/ contents to Cursor's plugin directory
 ```
-Cmd/Ctrl + Shift + P → "RLM: Install Workflow"
+
+### Post-Installation
+
+After installation, run the bootstrap script in your target repository:
+
+```bash
+# Navigate to your project
+cd /path/to/your/project
+
+# Run the bootstrap script
+powershell -ExecutionPolicy Bypass -File .agents/skills/rlm-workflow/scripts/install-rlm-workflow.ps1 -RepoRoot .
 ```
+
+This creates:
+- `.codex/rlm/` - Run artifacts directory
+- `.agent/PLANS.md` - Canonical workflow rules
+- `.codex/AGENTS.md` - Local invocation conventions
 
 ## 1. Introduction to RLM-workflow
 

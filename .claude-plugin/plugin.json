@@ -1,7 +1,7 @@
 {
   "id": "rlm-workflow",
   "name": "RLM Workflow",
-  "description": "Repo-Document Workflow (RLM) with strict phase gates, artifact locking, TDD discipline, and systematic debugging for disciplined software development",
+  "description": "Recursive Language Models (RLM) workflow with strict phase gates, artifact locking, TDD discipline, and systematic debugging",
   "version": "2.0.0",
   "author": "doubleuuser",
   "homepage": "https://github.com/doubleuuser/rlm-workflow",
