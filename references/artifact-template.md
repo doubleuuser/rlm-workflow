@@ -17,12 +17,13 @@ This guide is intentionally prescriptive so two different agents produce equival
 - [Required Header (All Artifacts)](#required-header-all-artifacts)
 - [Universal Sections (All Artifacts Except Phase 1 Optional Traceability)](#universal-sections-all-artifacts-except-phase-1-optional-traceability)
 - [Phase-by-Phase Authoring Templates](#phase-by-phase-authoring-templates)
-- [Phase 1 Template (`00-requirements.md`)](#phase-1-template-00-requirementsmd)
-- [Phase 2 Template (`01-as-is.md`)](#phase-2-template-01-as-ismd)
-- [Phase 3 Template (`02-to-be-plan.md`, ExecPlan Grade)](#phase-3-template-02-to-be-planmd-execplan-grade)
-- [Phase 4 Template (`03-implementation-summary.md`)](#phase-4-template-03-implementation-summarymd)
-- [Phase 5 Template (`04-test-summary.md`)](#phase-5-template-04-test-summarymd)
-- [Phase 6 Template (`05-manual-qa.md`)](#phase-6-template-05-manual-qamd)
+- [Phase 0 Requirements Template (`00-requirements.md`)](#phase-1-template-00-requirementsmd)
+- [Phase 1 Template (`01-as-is.md`)](#phase-2-template-01-as-ismd)
+- [Phase 2 Template (`02-to-be-plan.md`, ExecPlan Grade)](#phase-3-template-02-to-be-planmd-execplan-grade)
+- [Phase 3 Template (`03-implementation-summary.md`)](#phase-4-template-03-implementation-summarymd)
+- [Phase 3.5 Template (`03.5-code-review.md`) - Optional](#phase-45-template-035-code-reviewmd---optional)
+- [Phase 4 Template (`04-test-summary.md`)](#phase-5-template-04-test-summarymd)
+- [Phase 5 Template (`05-manual-qa.md`)](#phase-6-template-05-manual-qamd)
 - [Addenda Templates](#addenda-templates)
 - [Stage-Local Addendum](#stage-local-addendum)
 - [Upstream-Gap Addendum](#upstream-gap-addendum)
@@ -32,16 +33,52 @@ This guide is intentionally prescriptive so two different agents produce equival
 ## Quick Start Checklist
 
 1. Resolve the run id and exact output path.
-2. If writing Phase 3 or later, verify all prior phase artifacts are lock-valid before proceeding.
-3. Verify phase isolation: only the current phase may be `DRAFT`; do not proceed if a prior phase is unresolved.
-4. Determine effective inputs:
+2. **If starting a new run, create Phase 0 worktree FIRST (isolated workspace setup).**
+3. **If writing Phase 3 or later, verify all prior phase artifacts are lock-valid before proceeding.**
+4. Verify phase isolation: only the current phase may be `DRAFT`; do not proceed if a prior phase is unresolved.
+5. Determine effective inputs:
    - base input files for this phase
    - plus stage-local addenda for each base input, lexical order
-5. Write the required header with exact input/output paths.
-6. Write phase-specific content sections from this guide.
-7. Write `Traceability`, `Coverage Gate`, and `Approval Gate`.
-8. Keep `Status: DRAFT` while iterating.
-9. Lock only after both gates pass (`Status`, `LockedAt`, `LockHash`).
+6. Write the required header with exact input/output paths.
+7. Write phase-specific content sections from this guide.
+8. Write `Traceability`, `Coverage Gate`, and `Approval Gate`.
+9. **Review Rationalization Awareness: ensure you're not making excuses to skip steps.**
+10. Verify LockHash matches SHA-256 of content before locking.
+11. Lock only after both gates pass (`Status`, `LockedAt`, `LockHash`).
+
+## Rationalization Awareness
+
+When you find yourself thinking "this is different because..." or "I can skip this step," **you are rationalizing**. The process applies universally.
+
+### Common Rationalization Traps
+
+| If you're thinking... | The reality is... |
+|----------------------|-------------------|
+| "This requirement is simple" | Simple is where assumptions cause the most wasted work |
+| "I already know how it works" | You know how you THINK it works. Verify with evidence |
+| "The plan is just a guideline" | The plan is a commitment. Deviations need documentation |
+| "This is just a simple fix" | Simple code breaks. Follow the full process |
+| "I'll test after confirming it works" | Tests passing immediately prove nothing |
+| "Later/document later/come back later" | Later never comes. Do it now |
+| "I'm experienced, I know what matters" | Experience doesn't exempt you from discipline |
+
+### Full Rationalization Tables
+
+See `references/rationalizations.md` for comprehensive tables covering:
+- Universal rationalizations (all phases)
+- Phase 1-6 specific rationalizations
+- TDD-specific rationalizations
+- Locking/immutability rationalizations
+
+### The Anti-Rationalization Check
+
+Before claiming a gate PASS, verify:
+1. You're not skipping steps because "this time is different"
+2. You're not deferring documentation "for later"
+3. You're not treating the process as optional overhead
+4. You have concrete evidence, not just "I checked"
+
+**Violating the letter of the process is violating the spirit of quality.**
 
 ## Required Header (All Artifacts)
 
@@ -112,7 +149,157 @@ If either gate fails, set `FAIL` and list exact fixes required before proceeding
 
 ## Phase-by-Phase Authoring Templates
 
-## Phase 1 Template (`00-requirements.md`)
+## Phase 0 Template (`00-worktree.md`) - Isolation REQUIRED
+
+Required outcome:
+- Isolated git worktree created on feature branch
+- Worktree directory verified as git-ignored
+- Project setup completed
+- Clean test baseline verified
+- Main branch protection confirmed
+
+```md
+Run: `/.codex/rlm/<run-id>/`
+Phase: `00 Worktree Setup`
+Status: `DRAFT`
+Inputs:
+- Current git repository state
+- User preference (for worktree location)
+Outputs:
+- `/.codex/rlm/<run-id>/00-worktree.md`
+- Isolated worktree at `[location]`
+Scope note: This document records isolated workspace setup and verifies clean test baseline.
+
+## TODO
+
+- [ ] Verify current branch (main/master protection check)
+- [ ] Select worktree location (`.worktrees/<run-id>/` preferred)
+- [ ] Verify worktree directory is git-ignored
+- [ ] Create git worktree with feature branch
+- [ ] Run project setup (npm install, cargo build, etc.)
+- [ ] Verify clean test baseline (all tests passing)
+- [ ] Document worktree location and branch name
+- [ ] Record baseline commit SHA
+
+## Directory Selection
+
+**Convention checked:**
+- [ ] `.worktrees/` exists
+- [ ] `worktrees/` exists
+- [ ] CLAUDE.md preference found
+- [ ] User preference obtained
+
+**Selected location:** `.worktrees/` (project-local, hidden)
+**Rationale:** [why this location]
+
+## Safety Verification
+
+**Gitignore check:**
+```bash
+$ git check-ignore -q .worktrees && echo "IGNORED" || echo "NOT IGNORED"
+IGNORED
+```
+
+**Result:** ✅ Directory is properly ignored
+
+(If NOT ignored: added to .gitignore and committed before proceeding)
+
+## Worktree Creation
+
+**Current branch before:** `main` (or `master`)
+
+**Command:**
+```bash
+git worktree add .worktrees/<run-id> -b rlm/<run-id>
+```
+
+**Output:**
+```
+Preparing worktree (new branch 'rlm/<run-id>')
+HEAD is now at abc1234 Previous commit message
+```
+
+**Branch created:** `rlm/<run-id>`
+**Worktree location:** `/full/path/to/project/.worktrees/<run-id>`
+
+## Main Branch Protection
+
+**Original branch:** `main`
+**Action:** Created worktree (default behavior)
+**Isolation:** ✅ Working in isolated worktree
+
+(If on main and user insisted: document explicit consent here)
+
+## Project Setup
+
+**Detected project type:** [Node.js/Rust/Python/Go/etc.]
+
+**Commands executed:**
+```bash
+cd .worktrees/<run-id>
+[npm install / cargo build / pip install / etc.]
+```
+
+**Output:**
+```
+[setup output]
+```
+
+**Setup status:** ✅ Complete / ❌ Issues noted
+
+## Test Baseline Verification
+
+**Command:**
+```bash
+[npm test / cargo test / pytest / etc.]
+```
+
+**Results:**
+- Total: [N] tests
+- Passed: [N]
+- Failed: [N]
+- Skipped: [N]
+
+**Baseline:** ✅ Clean (all tests passing) / ❌ Pre-existing failures noted
+
+(If failures exist, document and get explicit consent to proceed)
+
+## Worktree Context
+
+**All subsequent phases will execute in:**
+- Directory: `.worktrees/<run-id>/`
+- Branch: `rlm/<run-id>`
+- Base commit: `abc1234`
+
+## Traceability
+
+- RLM process -> Isolated workspace established | Evidence: worktree at `.worktrees/<run-id>`
+
+## Coverage Gate
+
+- [ ] Worktree location selected following priority rules
+- [ ] Directory verified as git-ignored (if project-local)
+- [ ] Worktree created successfully on feature branch
+- [ ] Project setup completed without errors
+- [ ] Clean test baseline verified (all tests passing, or failures documented)
+- [ ] Main branch protection confirmed (working in isolation, or consent documented)
+
+Coverage: PASS / FAIL
+
+## Approval Gate
+
+- [ ] Isolated workspace ready for development
+- [ ] No pending setup issues
+- [ ] Ready to proceed to Phase 1/2
+- [ ] LockHash matches SHA-256 of content (verified)
+
+Approval: PASS / FAIL
+
+LockedAt: `YYYY-MM-DDTHH:MM:SSZ`
+LockHash: `<sha256-hex>`
+```
+
+## Phase 0 Requirements Template (`00-requirements.md`)
 
 Required outcome:
 - stable requirement IDs (`R1`, `R2`, ...)
@@ -122,13 +309,24 @@ Required outcome:
 
 ```md
 Run: `/.codex/rlm/<run-id>/`
-Phase: `01 Requirements`
+Phase: `00 Requirements`
 Status: `DRAFT`
 Inputs:
 - [chat summary or source notes if captured in repo]
 Outputs:
 - `/.codex/rlm/<run-id>/00-requirements.md`
 Scope note: This document defines stable requirement identifiers and acceptance criteria.
+
+## TODO
+
+- [ ] Elicit requirements from user/context
+- [ ] Define requirement identifiers (R1, R2, ...)
+- [ ] Write acceptance criteria for each requirement
+- [ ] Document out of scope items (OOS1, OOS2, ...)
+- [ ] List constraints and assumptions
+- [ ] Create traceability mapping
+- [ ] Complete Coverage Gate checklist
+- [ ] Complete Approval Gate checklist
 
 ## Requirements
 
@@ -165,7 +363,7 @@ Coverage: PASS
 Approval: PASS
 ```
 
-## Phase 2 Template (`01-as-is.md`)
+## Phase 1 Template (`01-as-is.md`)
 
 Required outcome:
 - novice-runnable repro
@@ -175,7 +373,7 @@ Required outcome:
 
 ```md
 Run: `/.codex/rlm/<run-id>/`
-Phase: `02 AS-IS`
+Phase: `01 AS-IS`
 Status: `DRAFT`
 Inputs:
 - `/.codex/rlm/<run-id>/00-requirements.md`
@@ -183,6 +381,18 @@ Inputs:
 Outputs:
 - `/.codex/rlm/<run-id>/01-as-is.md`
 Scope note: This document captures current behavior and evidence before changes.
+
+## TODO
+
+- [ ] Read and understand requirements from Phase 1
+- [ ] Create novice-runnable reproduction steps
+- [ ] Document current behavior for each requirement (R1, R2, ...)
+- [ ] Identify and record relevant code pointers
+- [ ] List known unknowns
+- [ ] Gather evidence (logs, screenshots, outputs)
+- [ ] Create traceability mapping
+- [ ] Complete Coverage Gate checklist
+- [ ] Complete Approval Gate checklist
 
 ## Reproduction Steps (Novice-Runnable)
 
@@ -222,7 +432,144 @@ Coverage: PASS
 Approval: PASS
 ```
 
-## Phase 3 Template (`02-to-be-plan.md`, ExecPlan Grade)
+## Phase 1.5 Template (`01.5-root-cause.md`) - Debug Mode Only
+
+Required outcome:
+- systematic root cause analysis for bug fixes
+- error analysis, reproduction verification, data flow tracing
+- documented hypothesis testing
+- root cause summary for Phase 3 planning
+
+**Use when:** Requirement involves fixing a bug, test failure, or investigating unexpected behavior.
+
+```md
+Run: `/.codex/rlm/<run-id>/`
+Phase: `01.5 Root Cause Analysis`
+Status: `DRAFT`
+Inputs:
+- `/.codex/rlm/<run-id>/01-as-is.md`
+- [relevant addenda]
+Outputs:
+- `/.codex/rlm/<run-id>/01.5-root-cause.md`
+Scope note: This document records systematic debugging process and identified root cause before any fix is attempted.
+
+## TODO
+
+- [ ] Analyze error messages and stack traces
+- [ ] Verify reproduction (confirm bug is reproducible)
+- [ ] Review recent changes (git history, dependencies)
+- [ ] Gather evidence (logs, data flow, state inspection)
+- [ ] Trace data flow to identify source
+- [ ] Analyze patterns (working vs broken comparisons)
+- [ ] Form and test hypotheses
+- [ ] Confirm root cause (not just symptom)
+- [ ] Define fix strategy for Phase 3
+- [ ] Complete Coverage Gate checklist
+- [ ] Complete Approval Gate checklist
+
+## Error Analysis
+
+**Error Message:** [verbatim]
+**Stack Trace:** [key frames]
+**File:Line:** [locations]
+**Key Insight:** [what the error is telling you]
+
+## Reproduction Verification
+
+**Steps:**
+1. [exact step]
+2. [exact step]
+3. [exact step]
+
+**Reproducible:** Yes / No / Intermittent
+**Frequency:** [X out of Y attempts]
+**Deterministic:** Yes / No
+
+## Recent Changes Analysis
+
+**Git History:** [relevant commits]
+**Dependency Changes:** [if applicable]
+**Environment:** [OS, runtime versions]
+**Likely Culprit:** [most suspicious change]
+
+## Evidence Gathering (Multi-Layer if applicable)
+
+**Layer 1: [Component]**
+- Input: [data]
+- Output: [data]
+- Status: ✅ Working / ❌ Broken
+
+**Failure Boundary:** [where it breaks]
+
+## Data Flow Trace
+
+**Error Location:** [file:line - function]
+**Bad Value:** [what was wrong]
+
+**Call Stack (backward):**
+1. `functionA()` at fileA:line - received [value]
+2. `functionB()` at fileB:line - passed [value]
+3. [source] `functionC()` at fileC:line - ORIGIN
+
+## Pattern Analysis
+
+**Working Example:** [file:location]
+**Broken Code:** [file:location]
+
+**Key Differences:**
+| Aspect | Working | Broken |
+|--------|---------|--------|
+| [X] | [value] | [value] |
+
+## Hypothesis Testing
+
+### Hypothesis 1
+**Statement:** [clear hypothesis]
+**Test:** [minimal change]
+**Result:** [confirmed/rejected]
+
+### Hypothesis 2 (if needed)
+[...]
+
+**Confirmed Root Cause:** [final hypothesis]
+
+## Root Cause Summary
+
+**Root Cause:** [one sentence]
+**Location:** [file:line]
+**Detailed Explanation:** [paragraph]
+**Fix Strategy:** [approach for Phase 3]
+**Test Strategy:** [how to verify fix]
+
+## Traceability
+
+- R# (Bug fix requirement) -> Root cause identified at [location] | Evidence: [section]
+
+## Coverage Gate
+
+- [ ] Error messages analyzed
+- [ ] Reproduction verified
+- [ ] Recent changes reviewed
+- [ ] Data flow traced to source
+- [ ] Pattern analysis completed
+- [ ] Hypothesis tested and confirmed
+- [ ] Root cause documented (not just symptom)
+- [ ] Fix strategy defined
+
+Coverage: PASS / FAIL
+
+## Approval Gate
+
+- [ ] Root cause identified at source (not just symptom location)
+- [ ] Fix approach clear and minimal
+- [ ] Test strategy defined
+- [ ] No "quick fix" attempts made
+- [ ] Ready to proceed to Phase 3 with fix plan
+
+Approval: PASS / FAIL
+```
+
+## Phase 2 Template (`02-to-be-plan.md`, ExecPlan Grade)
 
 Required outcome:
 - concrete edits by file and location
@@ -235,7 +582,7 @@ Required outcome:
 
 ```md
 Run: `/.codex/rlm/<run-id>/`
-Phase: `03 TO-BE plan`
+Phase: `02 TO-BE plan`
 Status: `DRAFT`
 Inputs:
 - `/.codex/rlm/<run-id>/01-as-is.md`
@@ -244,6 +591,20 @@ Inputs:
 Outputs:
 - `/.codex/rlm/<run-id>/02-to-be-plan.md`
 Scope note: This document defines the implementation and validation plan.
+
+## TODO
+
+- [ ] Read Phase 2 (AS-IS) and Phase 1 (Requirements) artifacts
+- [ ] If Phase 1.5 exists: incorporate root cause findings
+- [ ] Define sub-phases (SP1, SP2, ...) if scope/risk is large
+- [ ] Specify concrete file changes (what, where, how)
+- [ ] Define implementation steps in sequence
+- [ ] Design testing strategy (new + regression + guardrail)
+- [ ] Document Playwright test plan (if applicable)
+- [ ] Define manual QA scenarios
+- [ ] Create traceability mapping (R# → changes → validation)
+- [ ] Complete Coverage Gate checklist
+- [ ] Complete Approval Gate checklist
 
 ## Planned Changes by File
 
@@ -319,23 +680,41 @@ Coverage: PASS
 Approval: PASS
 ```
 
-## Phase 4 Template (`03-implementation-summary.md`)
+## Phase 3 Template (`03-implementation-summary.md`)
 
 Required outcome:
 - what changed, where, why
 - implementation evidence
+- **TDD compliance log (RED-GREEN-REFACTOR for each requirement)**
 - deviations from plan (if any)
 
 ```md
 Run: `/.codex/rlm/<run-id>/`
-Phase: `04 Implementation`
+Phase: `03 Implementation`
 Status: `DRAFT`
 Inputs:
 - `/.codex/rlm/<run-id>/02-to-be-plan.md`
 - `/.codex/rlm/<run-id>/addenda/02-to-be-plan.addendum-01.md` [if present]
 Outputs:
 - `/.codex/rlm/<run-id>/03-implementation-summary.md`
-Scope note: This document records completed code changes and implementation evidence.
+Scope note: This document records completed code changes, TDD compliance, and implementation evidence.
+
+## TODO
+
+- [ ] Read locked Phase 3 (TO-BE) plan
+- [ ] Determine execution mode (Parallel vs Sequential)
+- [ ] For each sub-phase (SP1, SP2, ...):
+  - [ ] Implement per plan (TDD discipline)
+  - [ ] Write tests BEFORE code (RED phase)
+  - [ ] Make tests pass (GREEN phase)
+  - [ ] Refactor while keeping tests green
+  - [ ] Self-review / subagent review
+  - [ ] Run integration tests
+- [ ] Complete TDD Compliance Log for all requirements
+- [ ] Document any plan deviations
+- [ ] Record implementation evidence (diffs, logs)
+- [ ] Complete Coverage Gate checklist
+- [ ] Complete Approval Gate checklist
 
 ## Changes Applied
 
@@ -346,6 +725,61 @@ Scope note: This document records completed code changes and implementation evid
 
 - `SP1`: [what shipped, files touched, notes]
 - `SP2`: [what shipped, files touched, notes]
+
+## TDD Compliance Log
+
+**The Iron Law:** NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST.
+
+### Requirement R1 ([description])
+
+**Test:** `path/to/test.spec.ts` - "[test name]"
+
+**RED Phase** ([ISO8601 timestamp]):
+```bash
+[exact command run]
+[test failure output - showing it failed correctly]
+```
+- Expected failure: [what should fail]
+- Actual failure: [what actually failed]
+- RED verified: ✅ / ❌
+
+**GREEN Phase** ([ISO8601 timestamp]):
+- Implementation: [minimal change made]
+```bash
+[exact command run]
+[test pass output]
+```
+- GREEN verified: ✅ / ❌
+
+**REFACTOR Phase** ([ISO8601 timestamp]):
+- Cleanups: [description of improvements]
+- All tests still passing: ✅ / ❌
+
+**Final State:** [All tests passing / Issues noted]
+
+### Requirement R2 (Bug Fix - Regression Test)
+
+**Regression Test:** `path/to/regression.test.ts` - "[test name]"
+
+**RED Phase** ([ISO8601 timestamp]):
+- Bug reproduced: [evidence]
+- RED verified: ✅ / ❌
+
+**GREEN Phase** ([ISO8601 timestamp]):
+- Fix applied: [minimal change]
+- GREEN verified: ✅ / ❌
+
+**REFACTOR:** [N/A or description]
+
+**Final State:** [Test passes, bug fixed]
+
+### TDD Red Flags Check
+
+- [ ] No code written before failing test
+- [ ] All RED phases documented with failure output
+- [ ] All GREEN phases documented with minimal implementation
+- [ ] No tests passing immediately (would indicate wrong test)
+- [ ] No "tests to be added later"
 
 ## Plan Deviations
 
@@ -364,33 +798,205 @@ Scope note: This document records completed code changes and implementation evid
 ...
 
 ## Coverage Gate
-...
-Coverage: PASS
+
+- [ ] All requirements (R1..Rn) have implementation
+- [ ] All sub-phases completed
+- **- [ ] TDD Compliance Log complete for all requirements**
+- **- [ ] No production code without preceding failing test**
+- [ ] Plan deviations documented (if any)
+- [ ] Implementation evidence recorded
+
+TDD Compliance: PASS / FAIL
+Coverage: PASS / FAIL
 
 ## Approval Gate
-...
-Approval: PASS
+
+- [ ] Implementation matches Phase 3 plan (or deviations documented)
+- [ ] All tests passing
+- [ ] Build/lint clean
+- **- [ ] TDD Iron Law followed (no code before tests)**
+- [ ] Ready for Phase 5
+
+Approval: PASS / FAIL
 ```
 
-## Phase 5 Template (`04-test-summary.md`)
+## Phase 3.5 Template (`03.5-code-review.md`) - Optional
+
+Required outcome:
+- Independent review of Phase 4 implementation against plan
+- Code quality assessment
+- Issue classification (Critical/Important/Minor)
+- Clear verdict (Approved / Changes Required)
+
+```md
+Run: `/.codex/rlm/<run-id>/`
+Phase: `03.5 Code Review`
+Status: `DRAFT`
+Inputs:
+- `/.codex/rlm/<run-id>/02-to-be-plan.md`
+- `/.codex/rlm/<run-id>/03-implementation-summary.md`
+- Git range: BASE_SHA..HEAD_SHA
+Outputs:
+- `/.codex/rlm/<run-id>/03.5-code-review.md`
+Scope note: This document records independent review of implementation against plan and coding standards.
+
+## TODO
+
+- [ ] Read Phase 3 plan and Phase 4 implementation
+- [ ] Review git diff (BASE_SHA..HEAD_SHA)
+- [ ] Assess plan alignment for each requirement (R1, R2, ...)
+- [ ] Assess plan alignment for each sub-phase (SP1, SP2, ...)
+- [ ] Evaluate code quality (architecture, naming, error handling)
+- [ ] Evaluate test quality (coverage, edge cases)
+- [ ] Verify TDD compliance
+- [ ] Categorize issues (Critical/Important/Minor)
+- [ ] Document positive findings
+- [ ] Record recommendations
+- [ ] Render verdict (Approved / Changes Required)
+- [ ] Complete Coverage Gate checklist
+- [ ] Complete Approval Gate checklist
+
+## Review Scope
+
+- Sub-phases reviewed: SP1, SP2, ...
+- Git range reviewed: [BASE_SHA]..[HEAD_SHA]
+
+## Plan Alignment Assessment
+
+- **R1**: [description]
+  - Plan requirement: [what was planned]
+  - Implementation: [what was done]
+  - Aligned: ✅ / ⚠️ / ❌
+  - Notes: [deviations if any]
+
+- **SP1**: [description]
+  - Plan specification: [what was specified]
+  - Implementation: [what was done]
+  - Aligned: ✅ / ⚠️ / ❌
+  - Notes: [deviations if any]
+
+## Code Quality Assessment
+
+### Architecture & Design
+- SOLID principles: ✅ / ⚠️ / ❌
+- Separation of concerns: ✅ / ⚠️ / ❌
+- Integration with existing code: ✅ / ⚠️ / ❌
+
+### Code Quality
+- Naming conventions: ✅ / ⚠️ / ❌
+- Error handling: ✅ / ⚠️ / ❌
+- Type safety: ✅ / ⚠️ / ❌
+- Maintainability: ✅ / ⚠️ / ❌
+
+### Test Quality
+- Test coverage adequate: ✅ / ⚠️ / ❌
+- Test quality: ✅ / ⚠️ / ❌
+- Edge cases covered: ✅ / ⚠️ / ❌
+
+### TDD Compliance
+- All production code preceded by failing tests: ✅ / ⚠️ / ❌
+- TDD cycles documented: ✅ / ⚠️ / ❌
+- No evidence of "code first, test later": ✅ / ⚠️ / ❌
+
+## Issues Found
+
+### Critical (must fix before proceeding)
+1. **[Issue name]**
+   - **Location:** `file:line`
+   - **Problem:** [description]
+   - **Recommendation:** [specific fix]
+
+### Important (should fix)
+1. **[Issue name]**
+   - **Location:** `file:line`
+   - **Problem:** [description]
+   - **Recommendation:** [specific fix]
+
+### Minor (suggestions)
+1. **[Issue name]**
+   - **Suggestion:** [description]
+
+## Positive Findings
+
+- [What was done well]
+
+## Recommendations
+
+- **Immediate:** [what to fix now]
+- **Future:** [improvements for later]
+
+## Verdict
+
+- [ ] **APPROVED** - Ready to proceed to Phase 5
+- [ ] **APPROVED WITH NOTES** - Minor issues, can proceed
+- [ ] **CHANGES REQUIRED** - Fix issues, then re-review
+
+## Review Metadata
+
+- Reviewer: [agent name / self-review]
+- Execution Mode: Parallel (subagent) / Sequential (self-review)
+- Review duration: [time spent]
+- Files reviewed: [count]
+- Lines of code reviewed: [count]
+
+## Traceability
+...
+
+## Coverage Gate
+
+- [ ] All sub-phases reviewed
+- [ ] Plan alignment verified for all requirements
+- [ ] Code quality assessed
+- [ ] Issues categorized by severity
+- [ ] Verdict recorded
+
+Coverage: PASS / FAIL
+
+## Approval Gate
+
+- [ ] Review completed objectively
+- [ ] Issues clearly documented
+- [ ] Verdict justified
+- [ ] Ready for Phase 5 (if approved)
+
+Approval: PASS / FAIL
+```
+
+## Phase 4 Template (`04-test-summary.md`)
 
 Required outcome:
 - exact commands executed
 - pass/fail outcomes
 - evidence artifact locations
 - flake/retry notes
+- parallel test execution summary (if applicable)
 
 ```md
 Run: `/.codex/rlm/<run-id>/`
-Phase: `05 Test Summary`
+Phase: `04 Test Summary`
 Status: `DRAFT`
 Inputs:
 - `/.codex/rlm/<run-id>/02-to-be-plan.md`
 - `/.codex/rlm/<run-id>/03-implementation-summary.md`
+- `/.codex/rlm/<run-id>/03.5-code-review.md` [if present]
 - [relevant addenda]
 Outputs:
 - `/.codex/rlm/<run-id>/04-test-summary.md`
 Scope note: This document records test execution evidence and readiness.
+
+## TODO
+
+- [ ] Read Phase 3 plan and Phase 4 implementation
+- [ ] Determine test execution mode (Parallel vs Sequential)
+- [ ] Execute unit tests (document commands and results)
+- [ ] Execute integration tests (document commands and results)
+- [ ] Execute E2E Tier A tests (document commands and results)
+- [ ] Execute Tier B regression tests (if applicable)
+- [ ] Document any failures and diagnostics
+- [ ] Note any flake/retry occurrences
+- [ ] Verify TDD compliance (all Phase 4 tests passing)
+- [ ] Complete Coverage Gate checklist
+- [ ] Complete Approval Gate checklist
 
 ## Environment
 
@@ -398,6 +1004,15 @@ Scope note: This document records test execution evidence and readiness.
 - Runtime versions:
 - Test framework versions:
 - Base URL / server mode:
+
+## Execution Mode
+
+- **Mode:** Parallel / Sequential
+- **Subagent Usage:**
+  - Unit tests: [subagent name] / Main agent
+  - Integration tests: [subagent name] / Main agent
+  - E2E tests: [subagent name] / Main agent
+- **Parallel execution time:** [X] minutes (vs [Y] estimated sequential)
 
 ## Commands Executed (Exact)
 
@@ -454,7 +1069,7 @@ Coverage: PASS
 Approval: PASS
 ```
 
-## Phase 6 Template (`05-manual-qa.md`)
+## Phase 5 Template (`05-manual-qa.md`)
 
 Required outcome:
 - plan scenarios executed by user
@@ -465,7 +1080,7 @@ Compact table is allowed in this phase.
 
 ```md
 Run: `/.codex/rlm/<run-id>/`
-Phase: `06 Manual QA`
+Phase: `05 Manual QA`
 Status: `DRAFT`
 Inputs:
 - `/.codex/rlm/<run-id>/02-to-be-plan.md`
@@ -473,6 +1088,17 @@ Inputs:
 Outputs:
 - `/.codex/rlm/<run-id>/05-manual-qa.md`
 Scope note: This document records user-validated QA outcomes and sign-off.
+
+## TODO
+
+- [ ] Read Phase 3 plan (QA scenarios)
+- [ ] Present QA scenarios to user
+- [ ] **PAUSE:** Wait for user to execute scenarios
+- [ ] Record observed outcomes for each scenario
+- [ ] Document pass/fail status
+- [ ] Record user sign-off (name, date, notes)
+- [ ] Complete Coverage Gate checklist
+- [ ] Complete Approval Gate checklist
 
 ## QA Scenarios and Results
 
@@ -600,4 +1226,40 @@ sha256sum .codex/rlm/<run-id>/<artifact>.md
 - Approval Gate says PASS with unresolved blockers.
 - `Traceability` references vague evidence instead of concrete files/commands.
 - Artifact locked without `LockedAt` and `LockHash`.
+- **LockHash does not match SHA-256 of file content (tampering detected).**
 - Editing locked prior-phase artifacts instead of writing addenda.
+- Working on main/master branch without explicit consent documented.
+- Worktree directory not git-ignored (project-local worktrees).
+- Baseline tests failing (pre-existing issues not documented).
+
+## Lock Verification
+
+### Automated Verification
+
+Use the provided script to verify all locks in a run:
+
+```powershell
+# Verify specific run
+.\.agents\skills\rlm-workflow\scripts\verify-locks.ps1 -RunId "2026-02-21-feature"
+
+# Fix incorrect hashes (use with caution)
+.\.agents\skills\rlm-workflow\scripts\verify-locks.ps1 -RunId "2026-02-21-feature" -Fix
+```
+
+### Manual Verification
+
+Compute SHA-256 hash:
+
+**PowerShell:**
+```powershell
+(Get-FileHash -Algorithm SHA256 '.codex/rlm/<run-id>/<artifact>.md').Hash.ToLower()
+```
+
+**Shell:**
+```bash
+sha256sum .codex/rlm/<run-id>/<artifact>.md
+```
+
+Compare computed hash with `LockHash` in artifact header. They must match exactly.
+
+

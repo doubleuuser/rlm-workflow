@@ -1,0 +1,129 @@
+{
+  "id": "rlm-workflow",
+  "name": "RLM Workflow",
+  "version": "2.0.0",
+  "description": "Repo-Document Workflow (RLM) with strict phase gates, artifact locking, TDD discipline, and systematic debugging",
+  "author": "doubleuuser",
+  "homepage": "https://github.com/doubleuuser/rlm-workflow",
+  "repository": "https://github.com/doubleuuser/rlm-workflow",
+  "license": "Apache-2.0",
+  "icon": "📋",
+  "tags": [
+    "workflow",
+    "documentation",
+    "tdd",
+    "debugging",
+    "process",
+    "quality"
+  ],
+  "engines": {
+    "cursor": ">=0.45.0"
+  },
+  "activationEvents": [
+    "onCommand:rlm.implement",
+    "onCommand:rlm.init",
+    "onCommand:rlm.status"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "rlm.implement",
+        "title": "RLM: Implement Requirement",
+        "category": "RLM Workflow",
+        "description": "Execute RLM workflow for a requirement"
+      },
+      {
+        "command": "rlm.init",
+        "title": "RLM: Initialize New Run",
+        "category": "RLM Workflow",
+        "description": "Create a new RLM run with scaffolding"
+      },
+      {
+        "command": "rlm.status",
+        "title": "RLM: Check Status",
+        "category": "RLM Workflow",
+        "description": "Check status of current RLM run"
+      },
+      {
+        "command": "rlm.phase",
+        "title": "RLM: Run Specific Phase",
+        "category": "RLM Workflow",
+        "description": "Execute a specific RLM phase"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "rlm.implement",
+          "when": "true"
+        },
+        {
+          "command": "rlm.init",
+          "when": "true"
+        },
+        {
+          "command": "rlm.status",
+          "when": "true"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "rlm.implement",
+        "key": "ctrl+shift+r i",
+        "mac": "cmd+shift+r i"
+      },
+      {
+        "command": "rlm.status",
+        "key": "ctrl+shift+r s",
+        "mac": "cmd+shift+r s"
+      }
+    ],
+    "configuration": {
+      "title": "RLM Workflow",
+      "properties": {
+        "rlm.autoResume": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically resume RLM runs from current phase"
+        },
+        "rlm.enforceTDD": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enforce TDD discipline in Phase 4"
+        },
+        "rlm.showNotifications": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show notifications for phase completions"
+        },
+        "rlm.runsDirectory": {
+          "type": "string",
+          "default": ".codex/rlm",
+          "description": "Directory for RLM run artifacts"
+        }
+      }
+    }
+  },
+  "skills": [
+    {
+      "id": "rlm-workflow",
+      "name": "RLM Workflow",
+      "description": "Execute RLM (Repo-Document Workflow) end-to-end with strict phase gates, artifact locking, addenda, traceability, and single-command auto-resume behavior",
+      "prompt": "You are executing the RLM (Repo-Document Workflow) system. Follow the canonical process defined in .agent/PLANS.md. Enforce strict phase gates, artifact locking with SHA-256 hashes, and complete Coverage/Approval gates for each phase. Use TDD discipline (RED-GREEN-REFACTOR) in Phase 4 and systematic debugging (Phase 2b) for bug fixes. Never edit locked prior-phase artifacts; use addenda instead."
+    },
+    {
+      "id": "rlm-tdd",
+      "name": "RLM TDD Discipline",
+      "description": "Enforce strict RED-GREEN-REFACTOR discipline with The Iron Law - no production code without a failing test first",
+      "prompt": "You are following TDD discipline for RLM Phase 4. The Iron Law: NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST. Follow strict RED-GREEN-REFACTOR cycles: RED (write failing test, verify it fails), GREEN (write minimal code to pass), REFACTOR (clean up while staying green). Document each phase in the TDD Compliance Log. If code was written before test: DELETE IT and start over."
+    },
+    {
+      "id": "rlm-debugging",
+      "name": "RLM Systematic Debugging",
+      "description": "Systematic 4-phase debugging for root cause analysis before attempting fixes",
+      "prompt": "You are performing systematic debugging (RLM Phase 2b). The Iron Law: NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST. Follow the 4-phase process: 1) Root Cause Investigation (read errors, reproduce, trace data flow), 2) Pattern Analysis (working vs broken), 3) Hypothesis and Testing (scientific method), 4) Fix Summary. Trace backward from symptom to source. Fix at source, not at symptom."
+    }
+  ]
+}

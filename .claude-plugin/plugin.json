@@ -1,0 +1,56 @@
+{
+  "id": "rlm-workflow",
+  "name": "RLM Workflow",
+  "description": "Repo-Document Workflow (RLM) with strict phase gates, artifact locking, TDD discipline, and systematic debugging for disciplined software development",
+  "version": "2.0.0",
+  "author": "doubleuuser",
+  "homepage": "https://github.com/doubleuuser/rlm-workflow",
+  "license": "Apache-2.0",
+  "minClaudeVersion": "2.0.0",
+  "skills": [
+    {
+      "name": "rlm-workflow",
+      "description": "Execute RLM (Repo-Document Workflow) end-to-end with strict phase gates, artifact locking, addenda, traceability, and single-command auto-resume behavior. Use when a request mentions 'Implement requirement run-id', asks to run a specific RLM phase, requires creating or updating files in .codex/rlm/run-id/, or asks to continue a paused run after manual QA.",
+      "file": "SKILL.md"
+    },
+    {
+      "name": "rlm-tdd",
+      "description": "Use when implementing any code in RLM Phase 4. Enforces strict RED-GREEN-REFACTOR discipline with The Iron Law - no production code without a failing test first.",
+      "file": "skills/rlm-tdd/SKILL.md"
+    },
+    {
+      "name": "rlm-debugging",
+      "description": "Use when RLM requirement involves debugging a bug, test failure, or unexpected behavior. Insert Phase 2b between Phase 2 and Phase 3 to perform systematic root cause analysis before attempting any fixes.",
+      "file": "skills/rlm-debugging/SKILL.md"
+    }
+  ],
+  "agents": [
+    {
+      "name": "code-reviewer",
+      "file": "agents/code-reviewer.md"
+    }
+  ],
+  "commands": [
+    {
+      "name": "rlm-init",
+      "description": "Initialize a new RLM run with requirements template",
+      "file": "commands/rlm-init.md"
+    },
+    {
+      "name": "rlm-status",
+      "description": "Check status of current RLM run",
+      "file": "commands/rlm-status.md"
+    }
+  ],
+  "hooks": {
+    "session-start": {
+      "command": "hooks/session-start.sh",
+      "async": false
+    }
+  },
+  "config": {
+    "skillsDirectory": ".agents/skills/rlm-workflow",
+    "autoUpdate": true,
+    "showSkillsOnStartup": true
+  }
+}
