@@ -150,8 +150,8 @@ $agentsBlock = @(
 
 Upsert-MarkedBlock `
   -FilePath $agentsPath `
-  -StartMarker "<!-- RLM-WORKFLOW-SKILL:START -->" `
-  -EndMarker "<!-- RLM-WORKFLOW-SKILL:END -->" `
+  -StartMarker "<!-- RLM-WORKFLOW:START -->" `
+  -EndMarker "<!-- RLM-WORKFLOW:END -->" `
   -BlockBody $agentsBlock
 
 if (-not $SkipPlansUpdate) {
@@ -176,12 +176,8 @@ if (-not $SkipPlansUpdate) {
   Write-Output "[INFO] Skipped PLANS update by configuration."
 }
 
-$updateSkillsScript = Join-Path $codexDir "scripts/update-agents-skills.ps1"
-if (Test-Path -LiteralPath $updateSkillsScript) {
-  Write-Output "[INFO] Refreshing installed skills section in .codex/AGENTS.md"
-  & powershell -ExecutionPolicy Bypass -File $updateSkillsScript | ForEach-Object { Write-Output $_ }
-} else {
-  Write-Output "[INFO] Skill index refresh script not found at $updateSkillsScript"
-}
+# Note: If a unified skills indexer exists in this skill package, invoke it here.
+# $updateSkillsScript = Join-Path $skillRoot "scripts/update-agents-skills.ps1"
+# if (Test-Path -LiteralPath $updateSkillsScript) { ... }
 
 Write-Output "[OK] RLM workflow installation bootstrap complete."

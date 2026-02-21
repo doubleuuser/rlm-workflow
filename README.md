@@ -2,14 +2,7 @@
 
 A multi-platform Recursive Language Models (RLM) workflow for AI-assisted software development with strict phase gates, TDD discipline, and systematic debugging.
 
-## Platform Support
-
-| Platform | Status |
-|----------|--------|
-| **Codex** | ✅ Fully Supported |
-| **Claude Code** | ✅ Fully Supported |
-| **OpenCode** | ✅ Fully Supported |
-| **Cursor** | ✅ Fully Supported |
+Distributed as Agent Skills; install via Skills CLI (works across supported agents).
 
 ## Installation
 
@@ -26,21 +19,15 @@ npx skills add doubleuuser/rlm-workflow --list
 npx skills add doubleuuser/rlm-workflow --skill '*'
 ```
 
-### Manual Installation
-
-```bash
-# Clone to your agent's skills directory
-git clone https://github.com/doubleuuser/rlm-workflow.git ~/.config/agents/skills/rlm-workflow
-# Or: git clone https://github.com/doubleuuser/rlm-workflow.git .agents/skills/rlm-workflow
-```
-
 ### Bootstrap
 
 After installation, the skill auto-bootstraps on first invocation. To manually bootstrap:
 
 ```bash
-powershell -ExecutionPolicy Bypass -File ./scripts/install-rlm-workflow.ps1 -RepoRoot .
+powershell -ExecutionPolicy Bypass -File "<SKILL_DIR>/scripts/install-rlm-workflow.ps1" -RepoRoot .
 ```
+
+Find the installed location via `npx skills list` (or use project-local install so `<SKILL_DIR>` is under `.agents/skills/...`).
 
 ## 1. Introduction to RLM-workflow
 
@@ -218,11 +205,13 @@ Verify integrity of locked artifacts:
 
 ```powershell
 # Verify specific run
-.\.agents\skills\rlm-workflow\scripts\verify-locks.ps1 -RunId "2026-02-21-feature"
+powershell -ExecutionPolicy Bypass -File "<SKILL_DIR>/scripts/verify-locks.ps1" -RepoRoot . -RunId "<run-id>"
 
 # Scan all runs
-.\.agents\skills\rlm-workflow\scripts\verify-locks.ps1
+powershell -ExecutionPolicy Bypass -File "<SKILL_DIR>/scripts/verify-locks.ps1" -RepoRoot .
 ```
+
+Find the installed location via `npx skills list` (or use project-local install so `<SKILL_DIR>` is under `.agents/skills/...`).
 
 ### Worktree Status
 
@@ -283,45 +272,7 @@ Hard gates (`<HG>`) are non-negotiable checkpoints that prevent skipping steps:
 
 **If a hard gate is violated:** STOP immediately, return to the skipped phase, complete it properly, lock it, then resume.
 
-## 6. Platform-Specific Features
-
-### Codex
-- **Installation:** `npx skills add`
-- **Skill Discovery:** Native via `npx skills` command
-- **Bootstrap:** PowerShell installer script
-- **Best For:** Teams using Codex CLI
-
-### Claude Code
-- **Installation:** Plugin marketplace
-- **Skill Discovery:** Via `Skill` tool
-- **Bootstrap:** Session start hook (`hooks/session-start.sh`)
-- **Slash Commands:** `/rlm:init`, `/rlm:status`
-- **Best For:** Teams using Claude Code with marketplace plugins
-
-### OpenCode
-- **Installation:** JavaScript plugin
-- **Skill Discovery:** Via native `skill` tool
-- **Bootstrap:** Plugin initialization with context injection
-- **Custom Tools:** `rlm:list-skills`, `rlm:status`
-- **Best For:** Teams using OpenCode.ai platform
-
-### Cursor
-- **Installation:** Plugin marketplace
-- **Skill Discovery:** Via skill prompts in plugin definition
-- **Commands:** `RLM: Implement Requirement`, `RLM: Initialize New Run`, `RLM: Check Status`
-- **Keybindings:** `Ctrl/Cmd+Shift+R I` (Implement), `Ctrl/Cmd+Shift+R S` (Status)
-- **Settings:** Configurable via Cursor settings UI
-- **Best For:** Teams using Cursor IDE
-
-### Cross-Platform Consistency
-
-All platforms share:
-- Same artifact structure (`.codex/rlm/<run-id>/`)
-- Same canonical rules (`.agent/PLANS.md`)
-- Same skill content (`SKILL.md` files)
-- Same TDD and debugging discipline
-
-## 7. How it does it
+## 6. How it does it
 
 - Reads `.codex/AGENTS.md` for local invocation conventions and `.agent/PLANS.md` for authoritative process rules.
 - Runs single-command orchestration with auto-resume:
@@ -339,13 +290,12 @@ All platforms share:
 - **Prevents rationalization via `references/rationalizations.md`** - Common excuse/reality tables
 - **Enforces TODO discipline** - Mandatory checkable TODOs in all phases; no locking with unchecked items
 
-## 8. How to modify the workflow
+## 7. How to modify the workflow
 
 Below are common customizations and exactly which file(s) to edit for each.
 
 1. Change trigger phrases or when the skill should activate.
    - Edit: `SKILL.md` (frontmatter `description`)
-   - Optional: `agents/openai.yaml` (`default_prompt`, `short_description`)
 
 2. Change phase behavior (for example, require an extra approval pause in Phase 3).
    - Edit: `SKILL.md` (single-command contract and phase rules)
@@ -395,39 +345,15 @@ Below are common customizations and exactly which file(s) to edit for each.
    - Edit: `README.md`
 
 12. Keep inserted AGENTS skills index in sync after edits.
-   - Run in target repo: `powershell -ExecutionPolicy Bypass -File .codex/scripts/update-agents-skills.ps1`
-
-## Platform-Specific Customization
-
-### Adding Platform-Specific Behaviors
-
-Each platform has its own configuration files:
-
-**Claude Code:**
-- `.claude-plugin/plugin.json` - Plugin metadata and skills
-- `.claude-plugin/marketplace.json` - Marketplace listing
-- `hooks/session-start.sh` - Session bootstrap
-- `commands/` - Slash command definitions
-
-**OpenCode:**
-- `.opencode/plugins/rlm-workflow.js` - Main plugin file
-- `.opencode/INSTALL.md` - Installation instructions
-- Uses JavaScript hooks instead of shell scripts
-
-**Cursor:**
-- `.cursor-plugin/plugin.json` - Plugin definition with commands and keybindings
-- Supports VS Code-style extension API
-- Settings integration with Cursor preferences
+   - Edit: `scripts/update-agents-skills.ps1` (unified skills indexer)
 
 ### Cross-Platform Skills
 
 Skills are shared across all platforms via the `skills/` directory:
-- `skills/rlm-worktree/SKILL.md` - Phase 0 worktree isolation (used by all platforms)
-- `skills/rlm-tdd/SKILL.md` - TDD discipline for Phase 3 (used by all platforms)
-- `skills/rlm-debugging/SKILL.md` - Systematic debugging for Phase 1.5 (used by all platforms)
-- `skills/rlm-subagent/SKILL.md` - Parallel execution with fallback (used by all platforms)
-
-Platform-specific wrappers reference these shared skill files.
+- `skills/rlm-worktree/SKILL.md` - Phase 0 worktree isolation
+- `skills/rlm-tdd/SKILL.md` - TDD discipline for Phase 3
+- `skills/rlm-debugging/SKILL.md` - Systematic debugging for Phase 1.5
+- `skills/rlm-subagent/SKILL.md` - Parallel execution with fallback
 
 
 

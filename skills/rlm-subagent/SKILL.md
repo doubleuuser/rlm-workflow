@@ -24,7 +24,7 @@ This skill provides parallel subagent execution for RLM Phase 3 (Implementation)
 | Multiple independent sub-phases | Use **Parallel Mode** (subagents) |
 | Single sub-phase or subagents unavailable | Use **Sequential Mode** (fallback) |
 | Code review needed | Use **Phase 3.5** (subagent or self-review) |
-| Parallel testing | Use **Phase 5** parallel dispatch |
+| Parallel testing | Use **Phase 4** parallel dispatch |
 
 ## TODO Discipline for Subagents
 
@@ -81,22 +81,18 @@ The controller MUST:
 
 ## Capability Detection
 
-**At start of Phase 4, detect subagent availability:**
+**At start of Phase 3, detect subagent availability:**
 
 ```
 IF can invoke "agent" or "Task" tool → Use Parallel Mode
 ELSE → Use Sequential Fallback Mode
 ```
 
-**Platform-specific detection:**
-- **Claude Code:** Check for `Task` tool
-- **Codex:** Check native subagent support
-- **OpenCode:** Check `skill` tool capabilities
-- **Cursor:** Limited subagent support → usually sequential
+**Detection rule:** If the platform provides a subagent/task primitive, use parallel mode; otherwise fallback to sequential.
 
 ## Parallel Mode (Subagents Available)
 
-### Phase 4: Parallel Sub-Phase Implementation
+### Phase 3: Parallel Sub-Phase Implementation
 
 **Controller responsibilities:**
 1. Read locked Phase 3 plan once
@@ -130,7 +126,7 @@ await Promise.all([
 
 **Review loop:** Issues found → implementer fixes → re-review
 
-### Phase 5: Parallel Testing
+### Phase 4: Parallel Testing
 
 **Dispatch pattern:**
 ```typescript
@@ -262,7 +258,7 @@ Follow the process in agents/code-reviewer.md
 [APPROVED / APPROVED WITH NOTES / CHANGES REQUIRED]
 ```
 
-**Phase 5 artifact must include:**
+**Phase 4 artifact must include:**
 ```markdown
 ## Execution Mode
 - **Mode:** Parallel / Sequential
@@ -356,25 +352,7 @@ Subagent available? ──NO──► SEQUENTIAL MODE
 
 **Phase 4:** Implement with TDD
 **Phase 3.5:** Mandatory code review
-**Phase 5:** Parallel testing (unit + integration + E2E)
-
-## Platform Notes
-
-### Claude Code
-- Excellent subagent support via `Task` tool
-- Recommended for parallel execution
-
-### Codex
-- Native subagent support
-- Full parallel mode capability
-
-### OpenCode
-- Check `skill` tool for subagent capabilities
-- May need sequential fallback
-
-### Cursor
-- Limited subagent support
-- Usually sequential mode
+**Phase 4:** Parallel testing (unit + integration + E2E)
 
 ## Troubleshooting
 
