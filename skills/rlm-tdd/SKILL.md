@@ -1,6 +1,6 @@
 ---
 name: rlm-tdd
-description: Use when implementing any code in RLM Phase 4. Enforces strict RED-GREEN-REFACTOR discipline with The Iron Law - no production code without a failing test first.
+description: Use when implementing any code in RLM Phase 3. Enforces strict RED-GREEN-REFACTOR discipline with The Iron Law - no production code without a failing test first.
 ---
 
 # RLM TDD Discipline
@@ -18,7 +18,7 @@ NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST
 
 ## When to Use
 
-**Always in Phase 4 (Implementation):**
+**Always in Phase 3 (Implementation):**
 - New features
 - Bug fixes
 - Refactoring
@@ -39,7 +39,7 @@ digraph tdd_cycle {
     green [label="GREEN\nMinimal code", shape=box, style=filled, fillcolor="#ccffcc"];
     verify_green [label="Verify passes\nAll green", shape=diamond];
     refactor [label="REFACTOR\nClean up", shape=box, style=filled, fillcolor="#ccccff"];
-    record [label="Record in\nPhase 4 artifact", shape=box];
+    record [label="Record in\nPhase 3 artifact", shape=box];
 
     red -> verify_red;
     verify_red -> green [label="yes"];
@@ -94,7 +94,7 @@ npm test path/to/test.test.ts
 - Failure message is expected
 - Fails because feature missing (not typos)
 
-**Record in Phase 4 artifact:**
+**Record in Phase 3 artifact:**
 ```markdown
 ### TDD Cycle for R3 (Email Validation)
 
@@ -142,7 +142,7 @@ function submitForm(
 ```
 </Bad>
 
-**Record in Phase 4 artifact:**
+**Record in Phase 3 artifact:**
 ```markdown
 **GREEN Phase:**
 - Implementation: Added null check for email field
@@ -161,7 +161,7 @@ After green only:
 
 **Never add behavior during refactor.**
 
-**Record in Phase 4 artifact:**
+**Record in Phase 3 artifact:**
 ```markdown
 **REFACTOR Phase:**
 - Extracted `validateRequired(field, name)` helper
@@ -197,11 +197,11 @@ If you encounter any of these, DELETE CODE and restart with TDD:
 - ❌ Test testing mock behavior, not real behavior
 - ❌ Multiple behaviors in one test ("and" in test name)
 
-## Integration with RLM Phase 4
+## Integration with RLM Phase 3
 
-### Phase 4 Artifact TDD Section
+### Phase 3 Artifact TDD Section
 
-Every Phase 4 artifact must include:
+Every Phase 3 artifact must include:
 
 ```markdown
 ## TDD Compliance Log
@@ -223,7 +223,7 @@ Every Phase 4 artifact must include:
 - Final state: ✅ Test passes, bug fixed
 ```
 
-### Phase 4 Coverage Gate Addition
+### Phase 3 Coverage Gate Addition
 
 ```markdown
 ## Coverage Gate
@@ -238,7 +238,7 @@ Every Phase 4 artifact must include:
 TDD Compliance: PASS / FAIL
 ```
 
-### Phase 4 Approval Gate Addition
+### Phase 3 Approval Gate Addition
 
 ```markdown
 ## Approval Gate
@@ -256,24 +256,24 @@ Approval: PASS / FAIL
 1. **Add Regression Test First**
    - Write test that reproduces the bug
    - Run test, confirm it fails with expected error
-   - Document failure in Phase 4 artifact
+   - Document failure in Phase 3 artifact
 
 2. **Implement Minimal Fix**
    - Fix only what's needed to make test pass
    - Run test, confirm it passes
-   - Document fix in Phase 4 artifact
+   - Document fix in Phase 3 artifact
 
 3. **Verify No Regressions**
    - Run full test suite
    - Confirm nothing else broke
-   - Document in Phase 4 artifact
+   - Document in Phase 3 artifact
 
-4. **Lock Phase 4**
+4. **Lock Phase 3**
    - TDD Compliance: PASS
    - Approval: PASS
    - Status: LOCKED
 
-## Example: Complete Phase 4 TDD Section
+## Example: Complete Phase 3 TDD Section
 
 ```markdown
 ## TDD Compliance Log
@@ -325,5 +325,6 @@ Result: 47 passing, 0 failing
 
 ## References
 
-- **REQUIRED:** Follow this skill for all Phase 4 implementation work
+- **REQUIRED:** Follow this skill for all Phase 3 implementation work
 - **SEE ALSO:** `references/rationalizations.md` for extended excuse/reality table
+

@@ -1,6 +1,6 @@
 ---
 name: rlm-workflow
-description: Execute this repository's RLM (Recursive Language Model) workflow end-to-end with strict phase gates, artifact locking, addenda, traceability, and single-command auto-resume behavior. Use when a request mentions "Implement requirement run-id", asks to run a specific RLM phase, requires creating or updating files in .codex/rlm/run-id/, needs an ExecPlan-grade Phase 2 plan under .agent/PLANS.md, or asks to continue a paused run after manual QA.
+description: Orchestrates the RLM repo workflow end-to-end with phase gates, locked artifacts, addenda, traceability, and automatic bootstrap/upsert of AGENTS/PLANS scaffolding.
 ---
 
 # RLM Workflow
@@ -9,21 +9,28 @@ description: Execute this repository's RLM (Recursive Language Model) workflow e
 
 Implement repository work using the canonical RLM process in `.agent/PLANS.md`, with invocation conventions from `.codex/AGENTS.md`. Treat repository artifacts as the source of truth and keep prompts as path-based commands.
 
-## Install Bootstrap
+## Bootstrap preflight (always run first)
 
-Run the bootstrap script when this skill is added to a repository:
+Before doing anything else, ensure the repo scaffolding exists and is up to date:
+
+- `.codex/AGENTS.md` contains the RLM Workflow block
+- `.agent/PLANS.md` is upserted from `references/plans-canonical.md`
+- `.codex/rlm/` exists
+- Any other files created by `scripts/install-rlm-workflow.ps1` exist
+
+If any are missing/outdated, run:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .agents/skills/rlm-workflow/scripts/install-rlm-workflow.ps1 -RepoRoot .
+powershell -ExecutionPolicy Bypass -File ./scripts/install-rlm-workflow.ps1 -RepoRoot .
 ```
 
-The script performs installation-time setup:
-- Creates `.codex/rlm/` scaffold (`.codex/rlm/.gitkeep`) and required global files if missing.
-- Guarantees `.agent/PLANS.md` exists after installation.
-- Adds explicit RLM workflow references to `.codex/AGENTS.md`.
-- Explicitly inserts: `Triggers on RLM requests like Implement requirement 'run-id' and phase-specific commands.`
-- Refreshes the auto-generated installed skills section when `.codex/scripts/update-agents-skills.ps1` exists.
-- Upserts full canonical RLM workflow content into `.agent/PLANS.md` from `references/plans-canonical.md` (skip with `-SkipPlansUpdate`).
+If PowerShell execution isn't possible, perform an equivalent manual bootstrap:
+
+- Create missing directories/files listed above
+- Copy/upsert canonical plans from `references/plans-canonical.md` into `.agent/PLANS.md`
+- Upsert the "RLM Workflow Skill" block into `.codex/AGENTS.md`
+
+Then continue with the workflow phases.
 
 ## Read Order
 
@@ -33,8 +40,8 @@ The script performs installation-time setup:
 
 ## Trigger Examples
 
-- `Implement requirement '2026-02-07-some-change'`
-- `Run RLM Phase 2 for .codex/rlm/2026-02-07-some-change/`
+- `Implement requirement '<run-id>'`
+- `Run RLM Phase 2 for .codex/rlm/<run-id>/`
 - `Create .codex/rlm/<run-id>/02-to-be-plan.md with Coverage and Approval gates`
 - `Update tests and lock Phase 4 artifact for this run`
 
@@ -700,6 +707,3 @@ When you find yourself thinking "this time is different" or "I can skip this ste
 **Reference:** `references/rationalizations.md` for comprehensive excuse/reality tables.
 
 **Violating the letter of the process is violating the spirit of quality.**
-
-
-

@@ -1,6 +1,6 @@
 ---
 name: rlm-worktree
-description: Use when starting any RLM requirement to set up an isolated git worktree. REQUIRED before Phase 2 - creates isolated workspace, verifies clean test baseline, and prevents main branch pollution.
+description: Use when starting any RLM requirement to set up an isolated git worktree. REQUIRED before Phase 1 - creates isolated workspace, verifies clean test baseline, and prevents main branch pollution.
 ---
 
 # RLM Git Worktree Isolation (Phase 0)
