@@ -347,6 +347,16 @@ Below are common customizations and exactly which file(s) to edit for each.
 12. Keep inserted AGENTS skills index in sync after edits.
    - Edit: `scripts/update-agents-skills.ps1` (unified skills indexer)
 
+## Optional Templates
+
+Copy/paste prompt templates for agents that support custom commands:
+
+- `docs/templates/commands/rlm-init.md` — prompt template to bootstrap a new run
+- `docs/templates/commands/rlm-status.md` — prompt template to summarize run status
+- `docs/templates/hooks/*` — optional hook templates (manual wiring only)
+
+These are templates only; Skills CLI does not register commands/hooks automatically.
+
 ### Cross-Platform Skills
 
 Skills are shared across all platforms via the `skills/` directory:
