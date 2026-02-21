@@ -1,6 +1,6 @@
 # RLM Workflow
 
-A multi-platform Repo-Document Workflow (RLM) for AI-assisted software development with strict phase gates, TDD discipline, and systematic debugging.
+A multi-platform Recursive Language Models (RLM) workflow for AI-assisted software development with strict phase gates, TDD discipline, and systematic debugging.
 
 ## Platform Support
 
@@ -55,7 +55,7 @@ Cmd/Ctrl + Shift + P → "RLM: Install Workflow"
 
 ## 1. Introduction to RLM-workflow
 
-`rlm-workflow` is a multi-platform skill/plugin for running the repository's RLM (Repo-Document Workflow) with strict phase gates, traceability, locking, and addenda rules.
+`rlm-workflow` is a multi-platform skill/plugin for running the repository's RLM (Recursive Language Models) workflow with strict phase gates, traceability, locking, and addenda rules.
 
 rlm-workflow is inspired by the MIT paper 'Recursive Language Models'. While the paper reports increased performance, reduced context rot and an effective context window of 10 million tokens by using agents, agents are a sidetrack. The core finding is that important information such as requirements, implementation plans and current codebase analysis must NOT be part of the agent context but stored in static files. 
 

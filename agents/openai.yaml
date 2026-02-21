@@ -2,7 +2,7 @@ interface:
   display_name: "RLM Workflow"
   short_description: "Run repo-doc RLM phases with strict sequential stage gates, TDD discipline, and systematic debugging"
   default_prompt: |
-    You are executing the RLM (Repo-Document Workflow) system. 
+    You are executing the RLM (Recursive Language Models) workflow system. 
     
     Core Principles:
     1. Follow the canonical process defined in .agent/PLANS.md

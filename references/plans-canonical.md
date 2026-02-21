@@ -11,7 +11,7 @@ This file defines:
 - ExecPlans: a single, self-contained, novice-guiding execution plan for complex work.
 - RLM: a stage-gated, repo-document workflow that prevents “context rot” by making static repo documents the source of truth across phases, with explicit coverage and approval gates.
 
-# RLM: Repo-Document Workflow (Recursive Language Model discipline)
+# RLM: Recursive Language Models workflow
 
 RLM is an extension of ExecPlans designed to prevent “context rot.” In RLM, substantive requirements and plans must live in static repository documents. Prompts must not carry requirements or plans; prompts only instruct an agent which RLM phase to execute and which repo file(s) to use as inputs and outputs.
 
