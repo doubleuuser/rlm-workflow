@@ -11,12 +11,35 @@ Distributed as Agent Skills; install via Skills CLI (works across supported agen
 ```bash
 # Interactive install
 npx skills add doubleuuser/rlm-workflow
+```
 
-# List available skills
+**NOTE:** This repo contains a root skill (`rlm-workflow`) plus additional subskills under `skills/*`.
+To list and install the full set from the repo root, use `--full-depth`.
+
+#### List skills
+
+```bash
+# List the root skill only
 npx skills add doubleuuser/rlm-workflow --list
 
-# Install all skills
-npx skills add doubleuuser/rlm-workflow --skill '*'
+# List ALL skills in the repo (root + subskills)
+npx skills add doubleuuser/rlm-workflow --list --full-depth
+```
+
+#### Install skills
+
+```bash
+# Install all skills (root + subskills)
+npx skills add doubleuuser/rlm-workflow --skill '*' --full-depth
+
+# Global install (available everywhere)
+npx skills add doubleuuser/rlm-workflow --skill '*' --full-depth -g -y
+
+# Install a single subskill
+# Option A (repo path):
+npx skills add doubleuuser/rlm-workflow/skills/rlm-tdd
+# Option B (explicit skill selection):
+npx skills add doubleuuser/rlm-workflow --skill rlm-tdd --full-depth
 ```
 
 ### Bootstrap
