@@ -1,6 +1,6 @@
 ---
 name: rlm-tdd
-description: Use when implementing any code in RLM Phase 3. Enforces strict RED-GREEN-REFACTOR discipline with The Iron Law - no production code without a failing test first.
+description: Use when implementing any code in RLM Phase 3. Enforces strict RED-GREEN-REFACTOR discipline with The Iron Law - no production code without a failing test first. Trigger phrases: "implement this", "add feature", "fix bug", "write a failing test", "TDD".
 ---
 
 # RLM TDD Discipline
@@ -15,6 +15,13 @@ Test-Driven Development is mandatory for all RLM implementation work. This skill
 ```
 NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST
 ```
+
+## Trigger examples
+
+- `Implement Phase 3 for run '2026-02-24-add-oauth'`
+- `Add a failing regression test first, then fix the bug`
+- `I already wrote the code; now add tests` (should trigger TDD reset guidance)
+- `Follow RED-GREEN-REFACTOR for this change`
 
 ## When to Use
 

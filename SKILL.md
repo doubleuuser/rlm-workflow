@@ -1,6 +1,6 @@
 ---
 name: rlm-workflow
-description: Orchestrates the RLM repo workflow end-to-end with phase gates, locked artifacts, addenda, traceability, and automatic bootstrap/upsert of AGENTS/PLANS scaffolding.
+description: Orchestrates the RLM repo workflow end-to-end with phase gates, locked artifacts, addenda, traceability, and automatic bootstrap/upsert of AGENTS/PLANS scaffolding. Trigger phrases: "Implement requirement '<run-id>'", "Run RLM Phase <N>", "resume requirement", "lock Phase <N>", "verify locks".
 ---
 
 # RLM Workflow
@@ -8,6 +8,14 @@ description: Orchestrates the RLM repo workflow end-to-end with phase gates, loc
 ## Overview
 
 Implement repository work using the canonical RLM process in `.agent/PLANS.md`, with invocation conventions from `.codex/AGENTS.md`. Treat repository artifacts as the source of truth and keep prompts as path-based commands.
+
+## Trigger examples
+
+- `Implement requirement '2026-02-24-add-oauth'`
+- `Run RLM Phase 2 for .codex/rlm/2026-02-24-add-oauth/`
+- `Resume requirement '2026-02-24-add-oauth' after manual QA`
+- `Verify locks for .codex/rlm/2026-02-24-add-oauth/`
+- `Lock Phase 3 for run '2026-02-24-add-oauth'`
 
 ## Bootstrap preflight (always run first)
 
@@ -21,7 +29,11 @@ Before doing anything else, ensure the repo scaffolding exists and is up to date
 If any are missing/outdated, run:
 
 ```powershell
+# Windows PowerShell:
 powershell -ExecutionPolicy Bypass -File ./scripts/install-rlm-workflow.ps1 -RepoRoot .
+
+# PowerShell 7+ (pwsh):
+pwsh -NoProfile -File ./scripts/install-rlm-workflow.ps1 -RepoRoot .
 ```
 
 If PowerShell execution isn't possible, perform an equivalent manual bootstrap:
@@ -58,12 +70,14 @@ Then continue with the workflow phases.
 - Resolve run folder at `.codex/rlm/<run-id>/`.
 - If run folder or `00-requirements.md` is missing, stop and ask for it. Do not invent requirements.
 - **Auto-resume from current state:**
-  - **Phase 0 (Worktree):** Check for isolated worktree. If missing or main branch, create worktree first.
+  - **Phase 0 (Requirements):** Confirm `00-requirements.md` exists (user-created starting point). Stop if missing.
+  - **Phase 0 (Worktree):** Create/enter an isolated worktree, then execute the run from that worktree.
   - If a phase artifact exists as `DRAFT` or with failing gates, resume that phase.
   - If a phase artifact is missing, create it for the next phase in sequence.
   - Never back-edit locked prior-phase artifacts.
 - Execute in order: Phase 0 through Phase 7.
 - **For Phase 0 (Worktree Isolation - REQUIRED):**
+  - Treat `00-requirements.md` as the starting input for the run (it must already exist).
   - Check if worktree exists at `.worktrees/<run-id>` or configured location.
   - If on main/master branch: require explicit consent or auto-create worktree.
   - Verify worktree directory is git-ignored (if project-local).
@@ -86,7 +100,7 @@ Then continue with the workflow phases.
 - **If Phase 0 exists:** It must be lock-valid before Phase 1/2 can begin (worktree isolation verified).
 - **If Phase 1.5 exists:** It must be lock-valid before Phase 2 can begin.
 - A prior phase is considered lock-valid only when its base artifact and phase-local addenda are `LOCKED`, include `LockedAt` and `LockHash`, and end with `Coverage: PASS` and `Approval: PASS`.
-- **Lock Verification:** Verify `LockHash` matches SHA-256 of file content. Use `scripts/verify-locks.ps1` for automated validation.
+- **Lock Verification:** Verify `LockHash` matches SHA-256 of normalized artifact content (LF newlines; `LockHash:` line removed). Use `scripts/verify-locks.ps1` for automated validation.
 - If any prior phase is not lock-valid, do not create or update later-phase artifacts.
 - Resume the earliest failing phase and repair it until lock-valid, then continue.
 - Never start Phase 6 or 7 unless `05-manual-qa.md` is lock-valid.
@@ -156,9 +170,9 @@ Every Phase 3 artifact must include:
 
 ### Red Flags - DELETE and Restart
 
-- Code written before test → DELETE IT
-- Test passes immediately → Fix the test
-- "I'll add tests later" → No you won't
+- Code written before test -> DELETE IT
+- Test passes immediately -> Fix the test
+- "I'll add tests later" -> No you won't
 
 **Reference:** `skills/rlm-tdd/SKILL.md`
 
@@ -322,7 +336,7 @@ Before setting `Status: LOCKED`:
 8. On pass, lock artifact:
    - Set `Status: LOCKED`
    - Add `LockedAt` (ISO8601)
-   - Add `LockHash` (SHA-256 of the file content)
+   - Add `LockHash` (SHA-256 of normalized artifact content; see `/.agent/PLANS.md` / `references/plans-canonical.md`)
 
 Use `references/artifact-template.md` for exact header and gate scaffolding.
 
@@ -377,7 +391,7 @@ Always enforce these sections from `.agent/PLANS.md` when applicable:
 3. **Phase 1.5 (`01.5-root-cause.md`) - Debug Mode (optional)**
    - **Trigger:** Use when requirement involves fixing a bug or investigating unexpected behavior.
    - **The Iron Law:** NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST.
-   - Follow systematic debugging: error analysis → reproduction → data flow tracing → hypothesis testing → root cause summary.
+   - Follow systematic debugging: error analysis -> reproduction -> data flow tracing -> hypothesis testing -> root cause summary.
    - Must be LOCKED before Phase 2 when present.
    - **Skill:** `skills/rlm-debugging/SKILL.md`
 
@@ -391,7 +405,7 @@ Always enforce these sections from `.agent/PLANS.md` when applicable:
    - Must include TDD Compliance Log documenting RED-GREEN-REFACTOR cycles.
    - **Parallel Mode (Subagent):** If 3+ independent sub-phases and subagent spawning available:
      - Dispatch fresh subagent per sub-phase
-     - Two-stage review: spec compliance → code quality
+     - Two-stage review: spec compliance -> code quality
      - Review loops until approved
      - Integration testing after all sub-phases complete
    - **Sequential Mode (Fallback):** If subagents unavailable:
@@ -431,29 +445,29 @@ When a requirement involves multiple concerns, use this priority order to determ
 
 ### Priority Order
 
-1. **Debugging** (bug fixes) → Run Phase 1.5 Root Cause Analysis first
+1. **Debugging** (bug fixes) -> Run Phase 1.5 Root Cause Analysis first
    - **Trigger:** Requirement mentions bug, test failure, or unexpected behavior
    - **Action:** Insert Phase 1.5 between Phase 1 and Phase 2
    - **Skill:** `skills/rlm-debugging/SKILL.md`
    - **Why:** Understanding root cause is prerequisite to planning the fix
 
-2. **Design/Analysis** (new features or changes) → Run full Phase 1 AS-IS Analysis
+2. **Design/Analysis** (new features or changes) -> Run full Phase 1 AS-IS Analysis
    - **Trigger:** New feature, enhancement, or behavior modification
    - **Action:** Execute Phase 1 thoroughly before Phase 2
    - **Why:** Must understand current state before defining future state
 
-3. **Implementation** → Proceed to Phase 2+ after analysis complete
+3. **Implementation** -> Proceed to Phase 2+ after analysis complete
    - **Trigger:** Phase 1 (or 1.5) is locked and ready
    - **Action:** Begin Phase 2 (TO-BE planning)
    - **Why:** Plans require complete understanding of current/debugging state
 
-4. **Testing** → Use TDD discipline in Phase 3
+4. **Testing** -> Use TDD discipline in Phase 3
    - **Trigger:** Any implementation work
    - **Action:** Apply TDD in Phase 3
    - **Skill:** `skills/rlm-tdd/SKILL.md`
    - **Why:** Tests validate implementation against requirements
 
-5. **Review** → Code review between implementation and final validation
+5. **Review** -> Code review between implementation and final validation
    - **Trigger:** Implementation complete (Phase 3 locked)
    - **Action:** Optional Phase 3.5 Code Review before Phase 4
    - **Why:** Catch issues before final validation
@@ -485,15 +499,15 @@ Phase 3 (TDD)
 
 | Requirement | Priority Applied | Execution Order | Execution Mode |
 |-------------|------------------|-----------------|----------------|
-| "Fix login crash" | Debugging first | Phase 0 → 1 → **1.5** → 2 → 3 → 4 → 5... | Sequential or Parallel |
-| "Add dark mode" | Design first | Phase 0 → **1** → 2 → 3 → 4 → 5... | Sequential (single SP) |
-| "Crash on empty input" | Debugging first | Phase 0 → 1 → **1.5** → 2 → 3 → 4... | Sequential or Parallel |
-| "Implement OAuth" | Design + Review | Phase 0 → 1 → 2 → 3 → **3.5** → 4 → 5... | Parallel (multiple SPs) |
-| "Multi-domain refactor" | Design + Parallel | Phase 0 → 1 → 2 → **3** → **3.5** → 4 → 5... | Parallel (subagents) |
+| "Fix login crash" | Debugging first | Phase 0 -> 1 -> **1.5** -> 2 -> 3 -> 4 -> 5... | Sequential or Parallel |
+| "Add dark mode" | Design first | Phase 0 -> **1** -> 2 -> 3 -> 4 -> 5... | Sequential (single SP) |
+| "Crash on empty input" | Debugging first | Phase 0 -> 1 -> **1.5** -> 2 -> 3 -> 4... | Sequential or Parallel |
+| "Implement OAuth" | Design + Review | Phase 0 -> 1 -> 2 -> 3 -> **3.5** -> 4 -> 5... | Parallel (multiple SPs) |
+| "Multi-domain refactor" | Design + Parallel | Phase 0 -> 1 -> 2 -> **3** -> **3.5** -> 4 -> 5... | Parallel (subagents) |
 
 **Execution Mode Legend:**
 - **Sequential:** Single sub-phase, no parallelism needed
-- **Parallel:** Multiple sub-phases, subagents available → concurrent execution
+- **Parallel:** Multiple sub-phases, subagents available -> concurrent execution
 - **Sequential or Parallel:** Mode determined by subagent availability check
 
 ## Hard Gates
@@ -501,7 +515,7 @@ Phase 3 (TDD)
 Hard gates are non-negotiable checkpoints that MUST be satisfied before proceeding. They prevent rationalization and corner-cutting.
 
 <HG>
-### Phase 0 → 1/2 Hard Gate
+### Phase 0 -> 1/2 Hard Gate
 
 Do NOT proceed to Phase 1 or 2 until:
 - Phase 0 worktree is created and verified
@@ -514,7 +528,7 @@ Do NOT proceed to Phase 1 or 2 until:
 </HG>
 
 <HG>
-### Phase 1 → 3 Hard Gate
+### Phase 1 -> 3 Hard Gate
 
 Do NOT create 02-to-be-plan.md until 01-as-is.md is LOCKED with:
 - Coverage: PASS
@@ -525,7 +539,7 @@ Do NOT create 02-to-be-plan.md until 01-as-is.md is LOCKED with:
 </HG>
 
 <HG>
-### Phase 1.5 → 3 Hard Gate (Debug Mode)
+### Phase 1.5 -> 3 Hard Gate (Debug Mode)
 
 Do NOT create TO-BE plan until root cause analysis is complete:
 - Phase 1.5 artifact is LOCKED
@@ -549,7 +563,7 @@ Do NOT write implementation code until:
 </HG>
 
 <HG>
-### Phase 4 → 6 Hard Gate
+### Phase 4 -> 6 Hard Gate
 
 Do NOT proceed to Manual QA until:
 - All tests from Phase 3 are passing
@@ -635,24 +649,24 @@ RLM supports two execution modes for Phase 3 (Implementation) and Phase 4 (Testi
 
 **Automatic detection at start of Phase 3:**
 1. Attempt to determine subagent capability
-2. If available → Use PARALLEL mode
-3. If unavailable → Use SEQUENTIAL mode with explicit documentation
+2. If available -> Use PARALLEL mode
+3. If unavailable -> Use SEQUENTIAL mode with explicit documentation
 
 **Platform-specific detection:**
 - **Claude Code:** Check for `Task` tool
 - **Codex:** Check native subagent support
 - **OpenCode:** Check `skill` tool capabilities
-- **Cursor:** Limited subagent support → usually sequential
+- **Cursor:** Limited subagent support -> usually sequential
 
 ### User Override
 
 User can explicitly request mode:
 ```
 "Implement requirement 'X' using parallel subagents"
-→ Attempt parallel, fallback if unavailable
+-> Attempt parallel, fallback if unavailable
 
 "Implement requirement 'X' with sequential execution"
-→ Force sequential even if subagents available
+-> Force sequential even if subagents available
 ```
 
 ### Mode Comparison
@@ -699,10 +713,10 @@ Pause only during Phase 5 for explicit user validation/sign-off. Do not pause fo
 When you find yourself thinking "this time is different" or "I can skip this step," **you are rationalizing**.
 
 **Common traps:**
-- "This requirement is simple" → Simple is where assumptions cause the most wasted work
-- "I already know how it works" → You know how you THINK it works. Verify with evidence.
-- "I'll document it later" → Later never comes. Document now.
-- "TDD is overkill for this fix" → Simple code breaks. The Iron Law has no exceptions.
+- "This requirement is simple" -> Simple is where assumptions cause the most wasted work
+- "I already know how it works" -> You know how you THINK it works. Verify with evidence.
+- "I'll document it later" -> Later never comes. Document now.
+- "TDD is overkill for this fix" -> Simple code breaks. The Iron Law has no exceptions.
 
 **Reference:** `references/rationalizations.md` for comprehensive excuse/reality tables.
 

@@ -1,6 +1,6 @@
 ---
 name: rlm-debugging
-description: Use when RLM requirement involves debugging a bug, test failure, or unexpected behavior. Insert Phase 1.5 between Phase 1 and Phase 2 to perform systematic root cause analysis before attempting any fixes.
+description: Use when RLM requirement involves debugging a bug, test failure, or unexpected behavior. Insert Phase 1.5 between Phase 1 and Phase 2 to perform systematic root cause analysis before attempting any fixes. Trigger phrases: "debug", "investigate", "failing tests", "crash", "root cause".
 ---
 
 # RLM Systematic Debugging (Phase 1.5)
@@ -15,6 +15,13 @@ When a requirement involves fixing a bug or investigating unexpected behavior, a
 ```
 NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST
 ```
+
+## Trigger examples
+
+- `Tests are failing after the last change; debug it`
+- `Fix crash on empty input`
+- `Investigate why the API returns wrong data`
+- `Do a root cause analysis before making changes`
 
 ## When to Use
 
@@ -42,11 +49,11 @@ Phase 1.5 is inserted between Phase 1 (AS-IS) and Phase 2 (TO-BE Plan) when debu
 
 ```
 Phase 0: 00-requirements.md
-    ↓
+    ->
 Phase 1: 01-as-is.md (captures current behavior)
-    ↓
-Phase 1.5: 01.5-root-cause.md ← NEW (this skill)
-    ↓
+    ->
+Phase 1.5: 01.5-root-cause.md <- NEW (this skill)
+    ->
 Phase 2: 02-to-be-plan.md (includes fix plan based on root cause)
 ```
 
@@ -94,7 +101,7 @@ digraph debugging_phases {
 - Can you trigger it reliably?
 - What are the exact steps?
 - Does it happen every time?
-- If not reproducible → gather more data, don't guess
+- If not reproducible -> gather more data, don't guess
 
 **Record in Phase 1.5 artifact:**
 ```markdown
@@ -129,7 +136,7 @@ digraph debugging_phases {
 
 #### 1.4 Gather Evidence in Multi-Component Systems
 
-**WHEN system has multiple components (CI → build → signing, API → service → database):**
+**WHEN system has multiple components (CI -> build -> signing, API -> service -> database):**
 
 **BEFORE proposing fixes, add diagnostic instrumentation:**
 
@@ -155,7 +162,7 @@ Run once to gather evidence showing WHERE it breaks, THEN analyze evidence.
 - Output: [data]
 - Status: ✅ Working / ❌ Broken
 
-**Failure Boundary:** Layer X → Layer Y
+**Failure Boundary:** Layer X -> Layer Y
 **Root Cause Location:** [specific component]
 ```
 
@@ -240,7 +247,7 @@ Trace backward:
 - Don't fix multiple things at once
 
 #### 3.3 Verify Before Continuing
-- Did it work? Yes → Phase 4
+- Did it work? Yes -> Phase 4
 - Didn't work? Form NEW hypothesis
 - DON'T add more fixes on top
 
@@ -431,7 +438,7 @@ LockHash: [sha256]
 
 ## Integration with RLM
 
-### Phase 1 → 1.5 Transition
+### Phase 1 -> 1.5 Transition
 
 When Phase 1 (AS-IS) identifies a bug/issue that needs fixing:
 
@@ -441,7 +448,7 @@ When Phase 1 (AS-IS) identifies a bug/issue that needs fixing:
 4. Lock Phase 1.5 when root cause found
 5. Proceed to Phase 3 with root cause knowledge
 
-### Phase 1.5 → 3 Transition
+### Phase 1.5 -> 3 Transition
 
 Phase 3 (`02-to-be-plan.md`) builds ON Phase 1.5:
 

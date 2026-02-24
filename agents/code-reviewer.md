@@ -71,11 +71,11 @@ Structure your review as follows:
 - **Overall assessment:** [Ready to proceed / Needs changes / Critical issues]
 
 ### Plan Alignment
-✅ / ⚠️ / ❌ [Assessment]
+OK / WARN / FAIL [Assessment]
 [Details on alignment with original plan]
 
 ### Code Quality
-✅ / ⚠️ / ❌ [Assessment]
+OK / WARN / FAIL [Assessment]
 [Specific findings]
 
 ### Issues Found

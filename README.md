@@ -47,7 +47,11 @@ npx skills add doubleuuser/rlm-workflow --skill rlm-tdd --full-depth
 After installation, the skill auto-bootstraps on first invocation. To manually bootstrap:
 
 ```bash
+# Windows PowerShell:
 powershell -ExecutionPolicy Bypass -File "<SKILL_DIR>/scripts/install-rlm-workflow.ps1" -RepoRoot .
+
+# PowerShell 7+ (pwsh):
+pwsh -NoProfile -File "<SKILL_DIR>/scripts/install-rlm-workflow.ps1" -RepoRoot .
 ```
 
 Find the installed location via `npx skills list` (or use project-local install so `<SKILL_DIR>` is under `.agents/skills/...`).
@@ -87,7 +91,7 @@ rlm-workflow uses a standard kanban-workflow with distinct phases like requireme
 **Safety & Control**
 - **Git Worktree Isolation** - Isolated workspace setup (REQUIRED before other phases)
 - **Branch Protection** - Prevents main branch work without explicit consent
-- **Lock Verification** - Automated SHA-256 hash validation
+- **Lock Verification** - Automated SHA-256 lock hash validation (normalized artifact content; see below)
 - **Hard Gates** - Non-negotiable checkpoints marked with `<HG>` tags prevent skipping steps
 
 ## 3. How to use it
@@ -116,7 +120,7 @@ rlm-workflow uses a standard kanban-workflow with distinct phases like requireme
    - User input required: Usually no.
 6. **Phase 1.5 (`01.5-root-cause.md`) - Root Cause Analysis (optional, debug mode):**
    - **When:** For bug fixes, test failures, unexpected behavior
-   - What it does: systematic 4-phase debugging (error analysis → reproduction → data flow tracing → hypothesis testing)
+   - What it does: systematic 4-phase debugging (error analysis -> reproduction -> data flow tracing -> hypothesis testing)
    - **The Iron Law:** No fixes without root cause investigation first
    - User input required: No.
 7. Phase 2 (`02-to-be-plan.md`) - TO-BE plan:
@@ -158,7 +162,7 @@ rlm-workflow uses a standard kanban-workflow with distinct phases like requireme
 Optional phase-specific control:
    - Example: `Run RLM Phase 3 for 00-my-first-requirements`
    - What it does: executes only one selected phase, but still enforces sequential lock-chain rules.
-   - User input required: Depends on phase (manual input required at Phase 6 only).
+   - User input required: Depends on phase (manual input required at Phase 5 only).
 
 ## Execution Modes
 
@@ -170,7 +174,7 @@ When subagent spawning is available (Claude Code `Task` tool, Codex native subag
 
 **Phase 3 - Parallel Implementation:**
 - Controller dispatches implementer subagents for independent sub-phases concurrently
-- Two-stage review: spec compliance → code quality
+- Two-stage review: spec compliance -> code quality
 - Review loops until each sub-phase is approved
 - Integration testing after all sub-phases complete
 
@@ -199,8 +203,8 @@ When subagents are unavailable (platform limitation, user request):
 **Automatic at Phase 3 start:**
 ```
 1. Check for agent/Task tool capability
-2. If available → Use PARALLEL mode
-3. If unavailable → Use SEQUENTIAL mode
+2. If available -> Use PARALLEL mode
+3. If unavailable -> Use SEQUENTIAL mode
 ```
 
 **Platforms:**
@@ -226,12 +230,20 @@ When subagents are unavailable (platform limitation, user request):
 
 Verify integrity of locked artifacts:
 
+`LockHash` is computed from a canonical normalized form of the artifact text (LF newlines, with the `LockHash:` line removed). Use the provided verifier script rather than hashing the raw file bytes directly.
+
 ```powershell
 # Verify specific run
 powershell -ExecutionPolicy Bypass -File "<SKILL_DIR>/scripts/verify-locks.ps1" -RepoRoot . -RunId "<run-id>"
+pwsh -NoProfile -File "<SKILL_DIR>/scripts/verify-locks.ps1" -RepoRoot . -RunId "<run-id>"
 
 # Scan all runs
 powershell -ExecutionPolicy Bypass -File "<SKILL_DIR>/scripts/verify-locks.ps1" -RepoRoot .
+pwsh -NoProfile -File "<SKILL_DIR>/scripts/verify-locks.ps1" -RepoRoot .
+
+# Fix incorrect hashes (use with caution; indicates post-lock modifications)
+powershell -ExecutionPolicy Bypass -File "<SKILL_DIR>/scripts/verify-locks.ps1" -RepoRoot . -RunId "<run-id>" -Fix
+pwsh -NoProfile -File "<SKILL_DIR>/scripts/verify-locks.ps1" -RepoRoot . -RunId "<run-id>" -Fix
 ```
 
 Find the installed location via `npx skills list` (or use project-local install so `<SKILL_DIR>` is under `.agents/skills/...`).
@@ -270,13 +282,13 @@ When a requirement involves multiple concerns, the workflow applies skills in pr
 
 | Priority | Concern | When to Apply |
 |----------|---------|---------------|
-| 1 | **Debugging** | Bug fixes, crashes, test failures → Run Phase 1.5 first |
-| 2 | **Design** | New features → Complete Phase 1 (AS-IS) before planning |
-| 3 | **Implementation** | After analysis complete → Proceed to Phase 3+ |
-| 4 | **Testing** | All implementation → Use TDD discipline in Phase 3 |
-| 5 | **Review** | After implementation → Optional Phase 3.5 Code Review |
+| 1 | **Debugging** | Bug fixes, crashes, test failures -> Run Phase 1.5 first |
+| 2 | **Design** | New features -> Complete Phase 1 (AS-IS) before planning |
+| 3 | **Implementation** | After analysis complete -> Proceed to Phase 3+ |
+| 4 | **Testing** | All implementation -> Use TDD discipline in Phase 3 |
+| 5 | **Review** | After implementation -> Optional Phase 3.5 Code Review |
 
-**Example:** "Fix login crash" → Debugging priority → Phase 1.5 (Root Cause) before Phase 2 (Planning)
+**Example:** "Fix login crash" -> Debugging priority -> Phase 1.5 (Root Cause) before Phase 2 (Planning)
 
 ### Hard Gates
 
@@ -368,15 +380,16 @@ Below are common customizations and exactly which file(s) to edit for each.
    - Edit: `README.md`
 
 12. Keep inserted AGENTS skills index in sync after edits.
-   - Edit: `scripts/update-agents-skills.ps1` (unified skills indexer)
+   - Edit: `scripts/install-rlm-workflow.ps1` (`$agentsBlock`)
+   - Then re-run the installer against the target repo (see Bootstrap section)
 
 ## Optional Templates
 
 Copy/paste prompt templates for agents that support custom commands:
 
-- `docs/templates/commands/rlm-init.md` — prompt template to bootstrap a new run
-- `docs/templates/commands/rlm-status.md` — prompt template to summarize run status
-- `docs/templates/hooks/*` — optional hook templates (manual wiring only)
+- `docs/templates/commands/rlm-init.md` - prompt template to bootstrap a new run
+- `docs/templates/commands/rlm-status.md` - prompt template to summarize run status
+- `docs/templates/hooks/*` - optional hook templates (manual wiring only)
 
 These are templates only; Skills CLI does not register commands/hooks automatically.
 
