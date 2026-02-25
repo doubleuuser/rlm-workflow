@@ -3,7 +3,7 @@ param(
     [string]$RunId = "",
     [string]$RepoRoot = (Get-Location).Path,
     [switch]$Fix,
-    [switch]$Verbose
+    [switch]$ShowHashes
 )
 
 <#
@@ -46,15 +46,26 @@ function Write-Status {
     Write-Host $Message
 }
 
-function Get-FileHash256 {
-    param([string]$FilePath)
-    
-    if (-not (Test-Path -LiteralPath $FilePath)) {
-        return $null
-    }
-    
-    $hash = Get-FileHash -Algorithm SHA256 -Path $FilePath
-    return $hash.Hash.ToLower()
+function Get-NormalizedArtifactTextForLockHash {
+    param([Parameter(Mandatory = $true)][string]$Content)
+
+    # Canonical LockHash input:
+    # - normalize newlines to LF
+    # - remove the LockHash line entirely (including its trailing newline, if present)
+    $normalized = $Content -replace "`r`n", "`n"
+    $normalized = $normalized -replace "`r", "`n"
+    $normalized = $normalized -replace "(?m)^[ \t]*LockHash:.*(?:`n|$)", ""
+
+    return $normalized
+}
+
+function Get-LockHash256FromContent {
+    param([Parameter(Mandatory = $true)][string]$Content)
+
+    $normalized = Get-NormalizedArtifactTextForLockHash -Content $Content
+    $bytes = [System.Text.Encoding]::UTF8.GetBytes($normalized)
+    $hashBytes = [System.Security.Cryptography.SHA256]::Create().ComputeHash($bytes)
+    return -join ($hashBytes | ForEach-Object { $_.ToString("x2") })
 }
 
 function Test-LockValid {
@@ -68,36 +79,36 @@ function Test-LockValid {
     }
     
     $content = Get-Content -LiteralPath $ArtifactPath -Raw -Encoding UTF8
-    
+
     # Extract Status
-    $statusMatch = $content | Select-String -Pattern "Status:\s*`?(\w+)`?"
-    if (-not $statusMatch) {
+    $statusMatch = [regex]::Match($content, '(?m)^[ \t]*Status:\s*(?:`|")?(\w+)(?:`|")?\s*$')
+    if (-not $statusMatch.Success) {
         return @{ Valid = $false; Error = "No Status field found" }
     }
-    
-    $status = $statusMatch.Matches[0].Groups[1].Value
+
+    $status = $statusMatch.Groups[1].Value
     if ($status -ne "LOCKED") {
         return @{ Valid = $false; Error = "Status is '$status', expected 'LOCKED'" }
     }
-    
+
     # Extract LockHash
-    $hashMatch = $content | Select-String -Pattern "LockHash:\s*`?([a-f0-9]{64})`?"
-    if (-not $hashMatch) {
+    $hashMatch = [regex]::Match($content, '(?m)^[ \t]*LockHash:\s*(?:`|")?([a-fA-F0-9]{64})(?:`|")?\s*$')
+    if (-not $hashMatch.Success) {
         return @{ Valid = $false; Error = "No LockHash field found" }
     }
-    
-    $storedHash = $hashMatch.Matches[0].Groups[1].Value.ToLower()
-    
+
+    $storedHash = $hashMatch.Groups[1].Value.ToLower()
+
     # Extract LockedAt
-    $lockedAtMatch = $content | Select-String -Pattern "LockedAt:\s*`?([\d-T:Z]+)`?"
-    if (-not $lockedAtMatch) {
+    $lockedAtMatch = [regex]::Match($content, '(?m)^[ \t]*LockedAt:\s*(?:`|")?([^`"\r\n]+)(?:`|")?\s*$')
+    if (-not $lockedAtMatch.Success) {
         return @{ Valid = $false; Error = "No LockedAt field found" }
     }
-    
-    $lockedAt = $lockedAtMatch.Matches[0].Groups[1].Value
-    
-    # Compute actual hash
-    $actualHash = Get-FileHash256 -FilePath $ArtifactPath
+
+    $lockedAt = $lockedAtMatch.Groups[1].Value
+
+    # Compute actual hash (canonical normalization: LF newlines; LockHash line removed)
+    $actualHash = Get-LockHash256FromContent -Content $content
     
     # Compare hashes
     if ($storedHash -ne $actualHash) {
@@ -110,19 +121,20 @@ function Test-LockValid {
         }
         
         if ($Fix) {
-            # Replace old hash with new hash
-            $newContent = $content -replace "LockHash:\s*`?[a-f0-9]{64}`?", "LockHash: `$actualHash`"
-            
-            # Update LockedAt
-            $newLockedAt = (Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ")
-            $newContent = $newContent -replace "LockedAt:\s*`?[\d-T:Z]+`?", "LockedAt: `$newLockedAt`"
-            
+            $newLockedAt = [DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
+
+            # Update LockedAt first, then compute and set LockHash based on the updated content.
+            $contentWithNewLockedAt = $content -replace "(?m)^[ \t]*LockedAt:.*$", ("LockedAt: ``{0}``" -f $newLockedAt)
+            $newActualHash = Get-LockHash256FromContent -Content $contentWithNewLockedAt
+            $newContent = $contentWithNewLockedAt -replace "(?m)^[ \t]*LockHash:.*$", ("LockHash: ``{0}``" -f $newActualHash)
+
             # Write back
             $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
             [System.IO.File]::WriteAllText($ArtifactPath, $newContent, $utf8NoBom)
-            
+
             $result.Fixed = $true
             $result.NewLockedAt = $newLockedAt
+            $result.NewHash = $newActualHash
         }
         
         return $result
@@ -181,16 +193,16 @@ Write-Host "Repository: $resolvedRepoRoot"
 
 if ($RunId) {
     Write-Host "Run ID: $RunId"
-    $rlmDir = Join-Path $resolvedRepoRoot ".codex" "rlm" $RunId
 } else {
     Write-Host "Run ID: (scanning all runs)"
-    $rlmDir = Join-Path $resolvedRepoRoot ".codex" "rlm"
 }
 
 Write-Host ""
 
-if (-not (Test-Path -LiteralPath $rlmDir)) {
-    Write-Status -Status "FAIL" -Message "RLM directory not found: $rlmDir"
+$rlmBaseDir = Join-Path (Join-Path $resolvedRepoRoot ".codex") "rlm"
+
+if (-not (Test-Path -LiteralPath $rlmBaseDir)) {
+    Write-Status -Status "FAIL" -Message "RLM directory not found: $rlmBaseDir"
     exit 1
 }
 
@@ -199,7 +211,7 @@ $runs = @()
 if ($RunId) {
     $runs = @($RunId)
 } else {
-    $runs = Get-ChildItem -Path $rlmDir -Directory | Select-Object -ExpandProperty Name | Sort-Object
+    $runs = Get-ChildItem -Path $rlmBaseDir -Directory | Select-Object -ExpandProperty Name | Sort-Object
 }
 
 $totalRuns = 0
@@ -209,20 +221,21 @@ $failedRuns = 0
 
 foreach ($run in $runs) {
     $totalRuns++
-    $runDir = Join-Path $rlmDir $run
+    $runDir = Join-Path $rlmBaseDir $run
     
     Write-Host "Checking run: $run"
     Write-Host "-" * 50
     
     $artifacts = @(
-        @{ File = "00-requirements.md"; Phase = "00"; Name = "Requirements"; Optional = $true }
+        @{ File = "00-requirements.md"; Phase = "00"; Name = "Requirements"; Optional = $false }
+        @{ File = "00-worktree.md"; Phase = "00"; Name = "Worktree Setup"; Optional = $false }
         @{ File = "01-as-is.md"; Phase = "01"; Name = "AS-IS Analysis"; Optional = $true }
         @{ File = "01.5-root-cause.md"; Phase = "01.5"; Name = "Root Cause"; Optional = $true }
         @{ File = "02-to-be-plan.md"; Phase = "02"; Name = "TO-BE Plan"; Optional = $true }
         @{ File = "03-implementation-summary.md"; Phase = "03"; Name = "Implementation"; Optional = $true }
+        @{ File = "03.5-code-review.md"; Phase = "03.5"; Name = "Code Review"; Optional = $true }
         @{ File = "04-test-summary.md"; Phase = "04"; Name = "Test Summary"; Optional = $true }
         @{ File = "05-manual-qa.md"; Phase = "05"; Name = "Manual QA"; Optional = $true }
-        @{ File = "00-worktree.md"; Phase = "00"; Name = "Worktree Setup"; Optional = $true }
     )
     
     $runValid = $true
@@ -232,15 +245,18 @@ foreach ($run in $runs) {
         $artifactPath = Join-Path $runDir $artifact.File
         
         if (-not (Test-Path -LiteralPath $artifactPath)) {
-            if (-not $artifact.Optional) {
+            if ($artifact.Optional) {
                 Write-Status -Status "INFO" -Message "$($artifact.Name): Not found (optional)"
+            } else {
+                Write-Status -Status "FAIL" -Message "$($artifact.Name): Missing (required)"
+                $runValid = $false
             }
             continue
         }
         
         # Check if locked
         $content = Get-Content -LiteralPath $artifactPath -Raw -Encoding UTF8
-        if (-not ($content -match "Status:\s*`?LOCKED`?")) {
+        if (-not ($content -match '(?m)^[ \t]*Status:\s*(?:`|")?LOCKED(?:`|")?\s*$')) {
             Write-Status -Status "WARN" -Message "$($artifact.Name): Not locked (DRAFT)"
             $runValid = $false
             continue
@@ -251,11 +267,14 @@ foreach ($run in $runs) {
         
         if ($result.Valid) {
             Write-Status -Status "PASS" -Message "$($artifact.Name): Valid (locked at $($result.LockedAt))"
+            if ($ShowHashes) {
+                Write-Host "         Hash: $($result.Hash)"
+            }
         } else {
             if ($result.Fixed) {
                 Write-Status -Status "WARN" -Message "$($artifact.Name): Fixed hash mismatch (was tampered)"
                 Write-Host "         Old hash: $($result.StoredHash)"
-                Write-Host "         New hash: $($result.ActualHash)"
+                Write-Host "         New hash: $($result.NewHash)"
                 Write-Host "         Updated at: $($result.NewLockedAt)"
                 $runFixed = $true
             } else {

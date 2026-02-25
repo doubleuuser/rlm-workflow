@@ -1,6 +1,7 @@
 # RLM Artifact Writing Guide and Templates
 
 Use this file when writing any per-run artifact in:
+- `/.codex/rlm/<run-id>/00-worktree.md`
 - `/.codex/rlm/<run-id>/00-requirements.md`
 - `/.codex/rlm/<run-id>/01-as-is.md`
 - `/.codex/rlm/<run-id>/02-to-be-plan.md`
@@ -14,26 +15,30 @@ This guide is intentionally prescriptive so two different agents produce equival
 ## Table of Contents
 
 - [Quick Start Checklist](#quick-start-checklist)
+- [Rationalization Awareness](#rationalization-awareness)
 - [Required Header (All Artifacts)](#required-header-all-artifacts)
 - [Universal Sections (All Artifacts Except Phase 1 Optional Traceability)](#universal-sections-all-artifacts-except-phase-1-optional-traceability)
 - [Phase-by-Phase Authoring Templates](#phase-by-phase-authoring-templates)
-- [Phase 0 Requirements Template (`00-requirements.md`)](#phase-1-template-00-requirementsmd)
-- [Phase 1 Template (`01-as-is.md`)](#phase-2-template-01-as-ismd)
-- [Phase 2 Template (`02-to-be-plan.md`, ExecPlan Grade)](#phase-3-template-02-to-be-planmd-execplan-grade)
-- [Phase 3 Template (`03-implementation-summary.md`)](#phase-4-template-03-implementation-summarymd)
-- [Phase 3.5 Template (`03.5-code-review.md`) - Optional](#phase-45-template-035-code-reviewmd---optional)
-- [Phase 4 Template (`04-test-summary.md`)](#phase-5-template-04-test-summarymd)
-- [Phase 5 Template (`05-manual-qa.md`)](#phase-6-template-05-manual-qamd)
+- [Phase 0 Template (`00-worktree.md`) - Isolation REQUIRED](#phase-0-template-00-worktreemd---isolation-required)
+- [Phase 0 Requirements Template (`00-requirements.md`)](#phase-0-requirements-template-00-requirementsmd)
+- [Phase 1 Template (`01-as-is.md`)](#phase-1-template-01-as-ismd)
+- [Phase 1.5 Template (`01.5-root-cause.md`) - Debug Mode Only](#phase-15-template-015-root-causemd---debug-mode-only)
+- [Phase 2 Template (`02-to-be-plan.md`, ExecPlan Grade)](#phase-2-template-02-to-be-planmd-execplan-grade)
+- [Phase 3 Template (`03-implementation-summary.md`)](#phase-3-template-03-implementation-summarymd)
+- [Phase 3.5 Template (`03.5-code-review.md`) - Optional](#phase-35-template-035-code-reviewmd---optional)
+- [Phase 4 Template (`04-test-summary.md`)](#phase-4-template-04-test-summarymd)
+- [Phase 5 Template (`05-manual-qa.md`)](#phase-5-template-05-manual-qamd)
 - [Addenda Templates](#addenda-templates)
 - [Stage-Local Addendum](#stage-local-addendum)
 - [Upstream-Gap Addendum](#upstream-gap-addendum)
 - [Locking Commands](#locking-commands)
 - [Common Failure Modes (Use as Pre-Lock Checklist)](#common-failure-modes-use-as-pre-lock-checklist)
+- [Lock Verification](#lock-verification)
 
 ## Quick Start Checklist
 
 1. Resolve the run id and exact output path.
-2. **If starting a new run, create Phase 0 worktree FIRST (isolated workspace setup).**
+2. **Ensure `00-requirements.md` exists, then create/lock Phase 0 worktree (`00-worktree.md`) before Phase 1+ (isolated workspace setup).**
 3. **If writing Phase 3 or later, verify all prior phase artifacts are lock-valid before proceeding.**
 4. Verify phase isolation: only the current phase may be `DRAFT`; do not proceed if a prior phase is unresolved.
 5. Determine effective inputs:
@@ -602,7 +607,7 @@ Scope note: This document defines the implementation and validation plan.
 - [ ] Design testing strategy (new + regression + guardrail)
 - [ ] Document Playwright test plan (if applicable)
 - [ ] Define manual QA scenarios
-- [ ] Create traceability mapping (R# → changes → validation)
+- [ ] Create traceability mapping (R# -> changes -> validation)
 - [ ] Complete Coverage Gate checklist
 - [ ] Complete Approval Gate checklist
 
@@ -842,7 +847,7 @@ Scope note: This document records independent review of implementation against p
 
 ## TODO
 
-- [ ] Read Phase 3 plan and Phase 4 implementation
+- [ ] Read Phase 2 plan and Phase 3 implementation summary
 - [ ] Review git diff (BASE_SHA..HEAD_SHA)
 - [ ] Assess plan alignment for each requirement (R1, R2, ...)
 - [ ] Assess plan alignment for each sub-phase (SP1, SP2, ...)
@@ -866,37 +871,37 @@ Scope note: This document records independent review of implementation against p
 - **R1**: [description]
   - Plan requirement: [what was planned]
   - Implementation: [what was done]
-  - Aligned: ✅ / ⚠️ / ❌
+  - Aligned: OK / WARN / FAIL
   - Notes: [deviations if any]
 
 - **SP1**: [description]
   - Plan specification: [what was specified]
   - Implementation: [what was done]
-  - Aligned: ✅ / ⚠️ / ❌
+  - Aligned: OK / WARN / FAIL
   - Notes: [deviations if any]
 
 ## Code Quality Assessment
 
 ### Architecture & Design
-- SOLID principles: ✅ / ⚠️ / ❌
-- Separation of concerns: ✅ / ⚠️ / ❌
-- Integration with existing code: ✅ / ⚠️ / ❌
+- SOLID principles: OK / WARN / FAIL
+- Separation of concerns: OK / WARN / FAIL
+- Integration with existing code: OK / WARN / FAIL
 
 ### Code Quality
-- Naming conventions: ✅ / ⚠️ / ❌
-- Error handling: ✅ / ⚠️ / ❌
-- Type safety: ✅ / ⚠️ / ❌
-- Maintainability: ✅ / ⚠️ / ❌
+- Naming conventions: OK / WARN / FAIL
+- Error handling: OK / WARN / FAIL
+- Type safety: OK / WARN / FAIL
+- Maintainability: OK / WARN / FAIL
 
 ### Test Quality
-- Test coverage adequate: ✅ / ⚠️ / ❌
-- Test quality: ✅ / ⚠️ / ❌
-- Edge cases covered: ✅ / ⚠️ / ❌
+- Test coverage adequate: OK / WARN / FAIL
+- Test quality: OK / WARN / FAIL
+- Edge cases covered: OK / WARN / FAIL
 
 ### TDD Compliance
-- All production code preceded by failing tests: ✅ / ⚠️ / ❌
-- TDD cycles documented: ✅ / ⚠️ / ❌
-- No evidence of "code first, test later": ✅ / ⚠️ / ❌
+- All production code preceded by failing tests: OK / WARN / FAIL
+- TDD cycles documented: OK / WARN / FAIL
+- No evidence of "code first, test later": OK / WARN / FAIL
 
 ## Issues Found
 
@@ -986,7 +991,7 @@ Scope note: This document records test execution evidence and readiness.
 
 ## TODO
 
-- [ ] Read Phase 3 plan and Phase 4 implementation
+- [ ] Read Phase 2 plan and Phase 3 implementation summary
 - [ ] Determine test execution mode (Parallel vs Sequential)
 - [ ] Execute unit tests (document commands and results)
 - [ ] Execute integration tests (document commands and results)
@@ -994,7 +999,7 @@ Scope note: This document records test execution evidence and readiness.
 - [ ] Execute Tier B regression tests (if applicable)
 - [ ] Document any failures and diagnostics
 - [ ] Note any flake/retry occurrences
-- [ ] Verify TDD compliance (all Phase 4 tests passing)
+- [ ] Verify TDD compliance (all Phase 3 tests passing)
 - [ ] Complete Coverage Gate checklist
 - [ ] Complete Approval Gate checklist
 
@@ -1210,13 +1215,18 @@ Approval: PASS
 PowerShell:
 
 ```powershell
-(Get-FileHash -Algorithm SHA256 '.codex/rlm/<run-id>/<artifact>.md').Hash.ToLower()
+$p = '.codex/rlm/<run-id>/<artifact>.md'
+$t = Get-Content -LiteralPath $p -Raw -Encoding UTF8
+$n = ($t -replace "`r`n","`n") -replace "(?m)^LockHash:.*(?:`n|$)",""
+$b = [System.Text.Encoding]::UTF8.GetBytes($n)
+$h = [System.Security.Cryptography.SHA256]::Create().ComputeHash($b)
+($h | ForEach-Object { $_.ToString("x2") }) -join ""
 ```
 
 Shell:
 
 ```bash
-sha256sum .codex/rlm/<run-id>/<artifact>.md
+sed '/^LockHash:/d' .codex/rlm/<run-id>/<artifact>.md | tr -d '\r' | sha256sum
 ```
 
 ## Common Failure Modes (Use as Pre-Lock Checklist)
@@ -1226,7 +1236,7 @@ sha256sum .codex/rlm/<run-id>/<artifact>.md
 - Approval Gate says PASS with unresolved blockers.
 - `Traceability` references vague evidence instead of concrete files/commands.
 - Artifact locked without `LockedAt` and `LockHash`.
-- **LockHash does not match SHA-256 of file content (tampering detected).**
+- **LockHash does not match SHA-256 of normalized content (tampering detected).**
 - Editing locked prior-phase artifacts instead of writing addenda.
 - Working on main/master branch without explicit consent documented.
 - Worktree directory not git-ignored (project-local worktrees).
@@ -1241,9 +1251,13 @@ Use the provided script to verify all locks in a run:
 ```powershell
 # Verify specific run
 .\.agents\skills\rlm-workflow\scripts\verify-locks.ps1 -RunId "2026-02-21-feature"
+# Or, when running from this repo:
+.\scripts\verify-locks.ps1 -RunId "2026-02-21-feature"
 
 # Fix incorrect hashes (use with caution)
 .\.agents\skills\rlm-workflow\scripts\verify-locks.ps1 -RunId "2026-02-21-feature" -Fix
+# Or, when running from this repo:
+.\scripts\verify-locks.ps1 -RunId "2026-02-21-feature" -Fix
 ```
 
 ### Manual Verification
@@ -1252,12 +1266,17 @@ Compute SHA-256 hash:
 
 **PowerShell:**
 ```powershell
-(Get-FileHash -Algorithm SHA256 '.codex/rlm/<run-id>/<artifact>.md').Hash.ToLower()
+$p = '.codex/rlm/<run-id>/<artifact>.md'
+$t = Get-Content -LiteralPath $p -Raw -Encoding UTF8
+$n = ($t -replace "`r`n","`n") -replace "(?m)^LockHash:.*(?:`n|$)",""
+$b = [System.Text.Encoding]::UTF8.GetBytes($n)
+$h = [System.Security.Cryptography.SHA256]::Create().ComputeHash($b)
+($h | ForEach-Object { $_.ToString("x2") }) -join ""
 ```
 
 **Shell:**
 ```bash
-sha256sum .codex/rlm/<run-id>/<artifact>.md
+sed '/^LockHash:/d' .codex/rlm/<run-id>/<artifact>.md | tr -d '\r' | sha256sum
 ```
 
 Compare computed hash with `LockHash` in artifact header. They must match exactly.

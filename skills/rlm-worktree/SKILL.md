@@ -1,6 +1,6 @@
 ---
 name: rlm-worktree
-description: Use when starting any RLM requirement to set up an isolated git worktree. REQUIRED before Phase 1 - creates isolated workspace, verifies clean test baseline, and prevents main branch pollution.
+description: Use when starting any RLM requirement to set up an isolated git worktree. REQUIRED before Phase 1 - creates isolated workspace, verifies clean test baseline, and prevents main branch pollution. Trigger phrases: "create worktree", "worktree isolation", "set up worktree", "don't work on main".
 ---
 
 # RLM Git Worktree Isolation (Phase 0)
@@ -20,6 +20,13 @@ Git worktrees create isolated workspaces sharing the same repository, allowing p
 NEVER WORK ON MAIN/MASTER BRANCH WITHOUT EXPLICIT CONSENT
 ```
 
+## Trigger examples
+
+- `Create an isolated worktree for this requirement`
+- `Set up Phase 0 worktree isolation for run '2026-02-24-add-oauth'`
+- `I'm on main; move me to a worktree`
+- `Use .worktrees/ and ensure it is git-ignored`
+
 ## When to Use
 
 **REQUIRED for all RLM runs:**
@@ -30,11 +37,11 @@ NEVER WORK ON MAIN/MASTER BRANCH WITHOUT EXPLICIT CONSENT
 
 **Insert as Phase 0:**
 ```
-Phase 0: 00-worktree.md (isolated workspace setup)
-    ↓
-Phase 1: 00-requirements.md (already exists)
-    ↓
-Phase 2: 01-as-is.md
+Phase 0R: 00-requirements.md (user-created first)
+    ->
+Phase 0W: 00-worktree.md (isolated workspace setup; this skill)
+    ->
+Phase 1: 01-as-is.md
 ```
 
 ## The Worktree Rule
@@ -278,7 +285,7 @@ branch=$(git branch --show-current)
 
 if [ "$branch" = "main" ] || [ "$branch" = "master" ]; then
     echo "╔════════════════════════════════════════════════════════════╗"
-    echo "║  ⚠️  MAIN BRANCH PROTECTION                                ║"
+    echo "║  !   MAIN BRANCH PROTECTION                                ║"
     echo "╠════════════════════════════════════════════════════════════╣"
     echo "║  You are currently on the $branch branch.                  ║"
     echo "║                                                            ║"
@@ -439,7 +446,7 @@ LockHash: `<sha256-hex>`
 
 ## Integration with RLM
 
-### Phase 0 → Phase 1 Transition
+### Phase 0 -> Phase 1 Transition
 
 Phase 0 must be locked before proceeding:
 
@@ -512,7 +519,7 @@ When updating global artifacts:
 | `.worktrees/` exists | Use it (verify ignored) |
 | `worktrees/` exists | Use it (verify ignored) |
 | Both exist | Use `.worktrees/` |
-| Neither exists | Check CLAUDE.md → Ask user |
+| Neither exists | Check CLAUDE.md -> Ask user |
 | Directory not ignored | Add to .gitignore + commit |
 | Tests fail during baseline | Report failures + ask |
 | On main/master branch | Create worktree (default) |

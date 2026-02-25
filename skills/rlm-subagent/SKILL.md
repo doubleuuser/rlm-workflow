@@ -1,21 +1,18 @@
 ---
 name: rlm-subagent
-description: |
-  Master skill for parallel subagent-driven execution with automatic fallback to single-agent sequential mode.
-  Use when implementing plans with multiple independent sub-phases (SP1, SP2...) to dispatch parallel subagents,
-  or when requiring code review between implementation and testing.
-triggers:
-  - "dispatch subagent"
-  - "parallel execution"
-  - "code review"
-  - "implementer subagent"
-  - "reviewer subagent"
-  - "subagents unavailable"
+description: Master skill for parallel subagent-driven execution with automatic fallback to single-agent sequential mode. Use when implementing plans with multiple independent sub-phases (SP1, SP2...) to dispatch parallel subagents, or when requiring code review between implementation and testing. Trigger phrases: "parallelize", "dispatch subagent", "split into sub-phases", "code review subagent", "parallel testing".
 ---
 
 # Subagent-Driven Execution with Fallback
 
 This skill provides parallel subagent execution for RLM Phase 3 (Implementation), Phase 3.5 (Code Review), and Phase 4 (Testing) with automatic fallback to sequential mode when subagents are unavailable.
+
+## Trigger examples
+
+- `Parallelize Phase 3 across independent sub-phases`
+- `Dispatch an implementer subagent for each SP`
+- `Run a separate code-reviewer subagent before Phase 4`
+- `Subagents aren't available; fall back to sequential mode`
 
 ## Quick Reference
 
@@ -84,8 +81,8 @@ The controller MUST:
 **At start of Phase 3, detect subagent availability:**
 
 ```
-IF can invoke "agent" or "Task" tool → Use Parallel Mode
-ELSE → Use Sequential Fallback Mode
+IF can invoke "agent" or "Task" tool -> Use Parallel Mode
+ELSE -> Use Sequential Fallback Mode
 ```
 
 **Detection rule:** If the platform provides a subagent/task primitive, use parallel mode; otherwise fallback to sequential.
@@ -124,7 +121,7 @@ await Promise.all([
 - Phase 3 plan for alignment check
 - Severity classification (Critical/Important/Minor)
 
-**Review loop:** Issues found → implementer fixes → re-review
+**Review loop:** Issues found -> implementer fixes -> re-review
 
 ### Phase 4: Parallel Testing
 
@@ -341,16 +338,16 @@ Subagent available? ──NO──► SEQUENTIAL MODE
 
 **Scenario:** SP2 depends on SP1 output
 
-**Phase 4 execution:**
-- Dispatch SP1 → wait → review → approve
-- Dispatch SP2 (with SP1 context) → wait → review → approve
+**Phase 3 execution:**
+- Dispatch SP1 -> wait -> review -> approve
+- Dispatch SP2 (with SP1 context) -> wait -> review -> approve
 - Sequential, not parallel
 
 ### Pattern 3: High-Risk Change
 
 **Scenario:** Critical auth system change
 
-**Phase 4:** Implement with TDD
+**Phase 3:** Implement with TDD
 **Phase 3.5:** Mandatory code review
 **Phase 4:** Parallel testing (unit + integration + E2E)
 

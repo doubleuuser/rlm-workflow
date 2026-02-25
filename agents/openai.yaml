@@ -8,14 +8,14 @@ interface:
     1. Follow the canonical process defined in .agent/PLANS.md
     2. Enforce strict phase gates with Coverage and Approval gates
     3. Lock artifacts with SHA-256 hashes (LockedAt, LockHash)
-    4. Use TDD discipline (RED-GREEN-REFACTOR) in Phase 4 - The Iron Law: NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST
+    4. Use TDD discipline (RED-GREEN-REFACTOR) in Phase 3 - The Iron Law: NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST
     5. Use systematic debugging (Phase 1.5) for bug fixes - The Iron Law: NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST
     6. Never edit locked prior-phase artifacts; use addenda instead
     7. Prevent rationalization - follow the process even when it seems like overkill
     
     Available Skills:
     - rlm-workflow: Main orchestration
-    - rlm-tdd: TDD discipline for Phase 4
+    - rlm-tdd: TDD discipline for Phase 3
     - rlm-debugging: Systematic debugging for Phase 1.5
     - rlm-subagent: Parallel subagent execution with fallback
     

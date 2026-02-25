@@ -103,7 +103,7 @@ Phase 1.5 — Root Cause Analysis (Debug Mode, optional)
 - **The Iron Law:** NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST
 - **TODO Requirement:** Phase artifact MUST include `## TODO` section with checkable items
 - **TODO Enforcement:** ALL TODO items must be checked off before locking
-- Follows systematic debugging: error analysis → reproduction → data flow tracing → hypothesis testing → root cause summary
+- Follows systematic debugging: error analysis -> reproduction -> data flow tracing -> hypothesis testing -> root cause summary
 - Must be LOCKED before Phase 2 when present
 
 Phase 2 — TO-BE plan (ExecPlan-grade)
@@ -123,7 +123,7 @@ Phase 3 — Implementation (TDD Discipline + Parallelization)
 - Must include TDD Compliance Log documenting RED-GREEN-REFACTOR cycles
 - All requirements must have tests written before implementation
 - **Execution Mode:**
-  - **Parallel Mode (Subagents Available):** Dispatch implementer subagents for independent sub-phases concurrently; two-stage review (spec → code quality)
+  - **Parallel Mode (Subagents Available):** Dispatch implementer subagents for independent sub-phases concurrently; two-stage review (spec -> code quality)
   - **Sequential Mode (Fallback):** Execute sub-phases sequentially in main agent with extended self-review
   - **Automatic Detection:** Check for agent/Task tool capability at phase start
 
@@ -138,7 +138,7 @@ Phase 3.5 — Code Review (optional)
   - **Sequential Mode:** Main agent self-review with extended checklist
 - Must be LOCKED before Phase 4 if present
 
-Phase 4 — Tests and validation
+Phase 4 - Tests and validation
 - Input: `02-to-be-plan.md` and `03-implementation-summary.md` (plus addenda)
 - Output: `04-test-summary.md`
 - **TODO Requirement:** Phase artifact MUST include `## TODO` section with checkable items
@@ -205,7 +205,7 @@ Scope note: This document defines the planned changes and how to validate them.
 When Status is `LOCKED`, append these fields to the header:
 
 - LockedAt: ISO8601 timestamp
-- LockHash: SHA-256 of the file content at lock time (excluding any later filesystem metadata)
+- LockHash: SHA-256 of normalized artifact content at lock time (LF newlines; `LockHash:` line removed)
 
 ### Required gate sections (end of file)
 
@@ -256,15 +256,40 @@ If the agent is in Phase N, it must not modify artifacts from Phase < N. If a Ph
 
 ### How to compute LockHash
 
-When locking an artifact, compute the SHA-256 hash from the repo root. For example:
+When locking an artifact, compute the SHA-256 hash from a **normalized** representation of the
+artifact text to avoid self-referential hashes and platform-specific newline differences.
 
-    sha256sum /.codex/rlm/<run-id>/01-as-is.md
+**Canonical rule (this repo):** `LockHash` is the SHA-256 of the artifact content after:
+1) normalizing newlines to `\n` (LF), and
+2) removing the `LockHash:` line entirely (including its trailing newline, if present).
 
-Record the resulting hex digest as `LockHash`.
+This makes `LockHash` stable across Windows/macOS/Linux and avoids the paradox of hashing a file
+that contains its own hash.
+
+#### Preferred: use the verifier script
+
+Use `scripts/verify-locks.ps1` to verify and (optionally) fix mismatched hashes.
+
+#### Manual computation examples
+
+**Bash (GNU coreutils):**
+
+    sed '/^LockHash:/d' /.codex/rlm/<run-id>/01-as-is.md | tr -d '\r' | sha256sum
+
+**PowerShell (Windows PowerShell 5.1 / PowerShell 7+):**
+
+    $p = "/.codex/rlm/<run-id>/01-as-is.md"
+    $t = Get-Content -LiteralPath $p -Raw -Encoding UTF8
+    $n = ($t -replace "`r`n","`n") -replace "(?m)^LockHash:.*(?:`n|$)",""
+    $b = [System.Text.Encoding]::UTF8.GetBytes($n)
+    $h = [System.Security.Cryptography.SHA256]::Create().ComputeHash($b)
+    ($h | ForEach-Object { $_.ToString("x2") }) -join ""
+
+Record the resulting 64-character lowercase hex digest as `LockHash`.
 
 ## Addenda (mandatory)
 
-Addenda are used to preserve immutability while allowing discovery, and to ensure “effective input” is not lost to context rot.
+Addenda are used to preserve immutability while allowing discovery, and to ensure "effective input" is not lost to context rot.
 
 All addenda live under:
 
@@ -278,7 +303,7 @@ Naming:
 
 - `<base-filename>.addendum-01.md`
 - `<base-filename>.addendum-02.md`
-- … and so on
+- ... and so on
 
 Examples:
 
@@ -372,7 +397,7 @@ Phase 2 — `02-to-be-plan.md` (ExecPlan-grade)
   - tests to add/run
   - manual QA scenarios
   - idempotence/recovery guidance
-- Must include traceability mapping R# → planned change + validation
+- Must include traceability mapping R# -> planned change + validation
 
 ## Large requirements: Implementation sub-phases (required when scope is large or risky)
 
@@ -633,7 +658,7 @@ Tier A for a sub-phase must be able to target the sub-phase tests without manual
 If the repo’s Playwright setup cannot reliably filter by tags, the Phase 2 plan must define an alternative (for example, file glob patterns that correspond to `rlm-<run-id>.sp<k>.*`), and must use that alternative consistently throughout Phase 3/5 execution and reporting.
 
 
-### Testing discipline (TDD + Playwright) — Phase 2 (TO-BE plan) must include a “Testing Strategy” section that specifies:
+### Testing discipline (TDD + Playwright) - Phase 2 (TO-BE plan) must include a "Testing Strategy" section that specifies:
 
 - New behavior tests to add (required for features).
 - Regression-first tests that fail on current behavior (required for bug fixes).
@@ -644,19 +669,19 @@ If the repo’s Playwright setup cannot reliably filter by tags, the Phase 2 pla
 Phase 3 — `03-implementation-summary.md`
 - Files touched (repo-relative paths)
 - What changed and why
-- Traceability mapping R# → implementation evidence
+- Traceability mapping R# -> implementation evidence
 
-### Testing discipline (TDD + Playwright) — Phase 3 (Implementation) must begin with tests-first:
+### Testing discipline (TDD + Playwright) - Phase 3 (Implementation) must begin with tests-first:
 
 - Bug fixes: add a failing regression test first, then implement until it passes.
 - Features: add tests for the new behavior first (may fail initially), then implement until they pass.
 
-Phase 4 — `04-test-summary.md`
+Phase 4 - `04-test-summary.md`
 - Tests executed (commands)
 - Results (pass/fail) with concise evidence
 - If any required test is failing, the phase must not advance until fixed or explicitly decided with rationale and mitigation recorded
 
-### Testing discipline (TDD + Playwright) — Phase 4 (Tests/validation) must run:
+### Testing discipline (Playwright + validation) - Phase 4 (Tests/validation) must run:
 
 - Tier A: the new/modified tests for this run plus relevant smoke tests.
 - Tier B: the full Playwright suite (or a broader tagged set) before locking the phase, unless an explicit constraint in `00-requirements.md` permits a narrower run.
@@ -674,7 +699,7 @@ This section defines requirements for:
 
 #### Phase 2 requirements (plan must define this up front)
 
-The ExecPlan-grade TO-BE plan (`02-to-be-plan.md`) must include a “Playwright Plan” subsection that specifies:
+The ExecPlan-grade TO-BE plan (`02-to-be-plan.md`) must include a "Playwright Plan" subsection that specifies:
 
 1) Which Playwright tests will be added or modified (file paths) and the intent of each test.
 2) Tagging strategy for this run:
@@ -872,7 +897,7 @@ When user invokes from main/master:
 
 ```
 ╔════════════════════════════════════════════════════════════╗
-║  ⚠️  MAIN BRANCH PROTECTION                                ║
+║  !   MAIN BRANCH PROTECTION                                ║
 ╠════════════════════════════════════════════════════════════╣
 ║  You are currently on the main/master branch.              ║
 ║                                                            ║
@@ -1049,7 +1074,7 @@ Every Phase 3 artifact must include:
 
 **Insert between Phase 1 and Phase 2:**
 ```
-Phase 1 (AS-IS) → Phase 1.5 (Root Cause) → Phase 2 (TO-BE Plan)
+Phase 1 (AS-IS) -> Phase 1.5 (Root Cause) -> Phase 2 (TO-BE Plan)
 ```
 
 ### The Iron Law
@@ -1111,20 +1136,29 @@ NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST
 Every locked artifact includes:
 - `Status: LOCKED`
 - `LockedAt: ISO8601 timestamp`
-- `LockHash: SHA-256 hash of file content`
+- `LockHash: SHA-256 hash of normalized artifact content (LF newlines; `LockHash:` line removed)`
 
 ### LockHash Computation
 
-The LockHash is a SHA-256 hash of the artifact file content at lock time.
+The LockHash is a SHA-256 hash of the normalized artifact content at lock time. See
+“How to compute LockHash” above for the canonical normalization rules.
+
+**Preferred:**
+- use `scripts/verify-locks.ps1` for verification (and optional fixing)
 
 **PowerShell:**
 ```powershell
-(Get-FileHash -Algorithm SHA256 'artifact.md').Hash.ToLower()
+$p = "artifact.md"
+$t = Get-Content -LiteralPath $p -Raw -Encoding UTF8
+$n = ($t -replace "`r`n","`n") -replace "(?m)^LockHash:.*(?:`n|$)",""
+$b = [System.Text.Encoding]::UTF8.GetBytes($n)
+$h = [System.Security.Cryptography.SHA256]::Create().ComputeHash($b)
+($h | ForEach-Object { $_.ToString("x2") }) -join ""
 ```
 
 **Shell:**
 ```bash
-sha256sum artifact.md
+sed '/^LockHash:/d' artifact.md | tr -d '\r' | sha256sum
 ```
 
 ### Lock Validity Rules
@@ -1135,7 +1169,7 @@ A phase artifact is **lock-valid** only when ALL of the following are true:
 2. **Status is LOCKED** (not DRAFT)
 3. **LockedAt is present** and is valid ISO8601 timestamp
 4. **LockHash is present** and is 64-character hex string
-5. **LockHash matches** SHA-256 of current file content
+5. **LockHash matches** SHA-256 of normalized artifact content (LF newlines; `LockHash:` line removed)
 6. **Coverage Gate ends with:** `Coverage: PASS`
 7. **Approval Gate ends with:** `Approval: PASS`
 
@@ -1156,7 +1190,7 @@ Use the provided PowerShell script to verify all locks:
 
 ### Tampering Detection
 
-If LockHash doesn't match file content:
+If LockHash doesn't match the canonical normalized content:
 
 1. **File was modified after locking** (tampering)
 2. **File encoding changed** (e.g., BOM added/removed)
@@ -1171,7 +1205,7 @@ If LockHash doesn't match file content:
 Before starting Phase N, verify lock chain for all prior phases:
 
 ```
-Phase 0 (Requirements) ──► Phase 0 (Worktree) ──► Phase 1 (AS-IS) ──► ...
+Phase 0 (Requirements) -> Phase 0 (Worktree) -> Phase 1 (AS-IS) -> ...
      LOCKED?               LOCKED?                  LOCKED?
 ```
 
@@ -1210,7 +1244,7 @@ When a requirement involves multiple concerns, use this priority order to determ
 | 2 | **Design** (new features) | Run full Phase 1 AS-IS Analysis | Core workflow |
 | 3 | **Implementation** | Proceed to Phase 2+ after analysis complete | Core workflow |
 | 4 | **Testing** | Use TDD discipline in Phase 3 | `rlm-tdd` |
-| 5 | **Review** | Run Phase 3.5 Code Review before Phase 4 | `rlm-review` (optional) |
+| 5 | **Review** | Run Phase 3.5 Code Review before Phase 4 | `rlm-subagent` (optional) |
 
 ### Decision Rules
 
@@ -1240,12 +1274,17 @@ After implementation but before final testing:
 
 ### Examples
 
+Notation:
+- `0R` = Phase 0 Requirements (`00-requirements.md`)
+- `0W` = Phase 0 Worktree Isolation (`00-worktree.md`)
+- `3.5?` = optional Phase 3.5 Code Review (`03.5-code-review.md`)
+
 | Requirement | Type | Phase Sequence |
 |-------------|------|----------------|
-| "Fix login crash" | Bug fix | 0 → 1 → 2 → **2b** → 3 → 4 → 5 → 6 → 7 → 8 |
-| "Add dark mode" | Feature | 0 → 1 → **2** → 3 → 4 → 5 → 6 → 7 → 8 |
-| "API returns wrong data" | Bug fix | 0 → 1 → 2 → **2b** → 3 → 4 → 5 → 6 → 7 → 8 |
-| "Refactor auth module" | Refactoring | 0 → 1 → **2** → 3 → 4 → **4.5** → 5 → 6 → 7 → 8 |
+| "Fix login crash" | Bug fix | 0R -> 0W -> 1 -> 1.5 -> 2 -> 3 -> 3.5? -> 4 -> 5 -> 6 -> 7 |
+| "Add dark mode" | Feature | 0R -> 0W -> 1 -> 2 -> 3 -> 3.5? -> 4 -> 5 -> 6 -> 7 |
+| "API returns wrong data" | Bug fix | 0R -> 0W -> 1 -> 1.5 -> 2 -> 3 -> 3.5? -> 4 -> 5 -> 6 -> 7 |
+| "Refactor auth module" | Refactoring | 0R -> 0W -> 1 -> 2 -> 3 -> 3.5? -> 4 -> 5 -> 6 -> 7 |
 
 ---
 
@@ -1275,7 +1314,7 @@ Do NOT proceed to Phase 2 until Phase 0 is LOCKED with:
 **Exception:** None. Phase 0 is REQUIRED.
 </HG>
 
-### HG-1: Phase 2 → 3 Hard Gate
+### HG-1: Phase 2 -> 3 Hard Gate
 
 <HG>
 Do NOT create 02-to-be-plan.md until 01-as-is.md is LOCKED with:
@@ -1310,7 +1349,7 @@ Do NOT write implementation code until:
 **Exception:** None. The Iron Law has no exceptions.
 </HG>
 
-### HG-4: Phase 4 → 6 Hard Gate
+### HG-4: Phase 4 -> 6 Hard Gate
 
 <HG>
 Do NOT proceed to Manual QA until:

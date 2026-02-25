@@ -88,7 +88,7 @@ These tables document common cognitive biases and rationalizations that lead to 
 | "This is just a simple fix, no test needed" | Simple code breaks. Test takes 30 seconds. |
 | "I'll test after confirming the fix works" | Tests passing immediately prove nothing. You never saw it catch the bug. |
 | "Tests after achieve same goals" | Tests-after = "what does this do?" Tests-first = "what should this do?" |
-| "I already manually tested it" | Ad-hoc ≠ systematic. No record, can't re-run, no regression protection. |
+| "I already manually tested it" | Ad-hoc != systematic. No record, can't re-run, no regression protection. |
 | "Deleting working code is wasteful" | Sunk cost fallacy. Keeping unverified code is technical debt. |
 | "TDD is dogmatic, I'm being pragmatic" | TDD IS pragmatic. Finds bugs before commit, enables refactoring. |
 | "I'll keep the code as reference" | You'll adapt it. That's testing after. Delete means delete. |
@@ -96,7 +96,7 @@ These tables document common cognitive biases and rationalizations that lead to 
 | "I need to explore first" | Fine. Throw away exploration, start TDD fresh. |
 | "This is different because..." | It's not. The rules don't have exceptions. |
 | "The test passes immediately, that's good" | Immediate pass = not testing what you think. Fix the test. |
-| "I can add tests in Phase 5" | Phase 4 requires TDD. Phase 5 verifies. Don't defer. |
+| "I can add tests in Phase 5" | Phase 3 requires TDD. Phase 4 validates. Phase 5 is manual QA. Don't defer. |
 
 ### Implementation-General
 
@@ -198,9 +198,9 @@ These tables document common cognitive biases and rationalizations that lead to 
    or "I can skip this step," reference `references/rationalizations.md`.
    
    Common traps:
-   - "This is simple" → Simple is where assumptions live
-   - "I'm experienced" → Experience doesn't exempt discipline
-   - "I'll do it later" → Later never comes
+   - "This is simple" -> Simple is where assumptions live
+   - "I'm experienced" -> Experience doesn't exempt discipline
+   - "I'll do it later" -> Later never comes
    ```
 
 2. **In Phase Reviews:**

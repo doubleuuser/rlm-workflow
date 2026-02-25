@@ -29,13 +29,14 @@ RLM Run: 2026-02-21-user-auth
 ========================
 
 Phase Status:
-  Phase 0 (Requirements)     ✅ LOCKED
-  Phase 1 (AS-IS)           ✅ LOCKED
-  Phase 1.5 (Root Cause)     ⏭️  SKIPPED (not needed)
-  Phase 2 (TO-BE Plan)      📝 DRAFT
-  Phase 3 (Implementation)  ⏳ PENDING
-  Phase 4 (Test Summary)    ⏳ PENDING
-  Phase 5 (Manual QA)       ⏳ PENDING
+  Phase 0 (Requirements)     [LOCKED]
+  Phase 0 (Worktree)         [LOCKED]
+  Phase 1 (AS-IS)            [LOCKED]
+  Phase 1.5 (Root Cause)     [SKIPPED] (not needed)
+  Phase 2 (TO-BE Plan)       [DRAFT]
+  Phase 3 (Implementation)   [PENDING]
+  Phase 4 (Test Summary)     [PENDING]
+  Phase 5 (Manual QA)        [PENDING]
 
 Current Phase: 2 (TO-BE Plan)
 Status: DRAFT
