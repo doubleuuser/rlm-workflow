@@ -1,6 +1,6 @@
 ---
 name: rlm-tdd
-description: Use when implementing any code in RLM Phase 3. Enforces strict RED-GREEN-REFACTOR discipline with The Iron Law - no production code without a failing test first. Trigger phrases: "implement this", "add feature", "fix bug", "write a failing test", "TDD".
+description: 'Use when implementing any code in RLM Phase 3. Enforces strict RED-GREEN-REFACTOR discipline with The Iron Law - no production code without a failing test first. Trigger phrases: "implement this", "add feature", "fix bug", "write a failing test", "TDD".'
 ---
 
 # RLM TDD Discipline
@@ -334,4 +334,3 @@ Result: 47 passing, 0 failing
 
 - **REQUIRED:** Follow this skill for all Phase 3 implementation work
 - **SEE ALSO:** `references/rationalizations.md` for extended excuse/reality table
-

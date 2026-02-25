@@ -1,6 +1,6 @@
 ---
 name: rlm-workflow
-description: Orchestrates the RLM repo workflow end-to-end with phase gates, locked artifacts, addenda, traceability, and automatic bootstrap/upsert of AGENTS/PLANS scaffolding. Trigger phrases: "Implement requirement '<run-id>'", "Run RLM Phase <N>", "resume requirement", "lock Phase <N>", "verify locks".
+description: 'Orchestrates the RLM repo workflow end-to-end with phase gates, locked artifacts, addenda, traceability, and automatic bootstrap/upsert of AGENTS/PLANS scaffolding. Trigger phrases: "Implement requirement <run-id>", "Run RLM Phase <N>", "resume requirement", "lock Phase <N>", "verify locks".'
 ---
 
 # RLM Workflow

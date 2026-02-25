@@ -1,6 +1,6 @@
 ---
 name: rlm-debugging
-description: Use when RLM requirement involves debugging a bug, test failure, or unexpected behavior. Insert Phase 1.5 between Phase 1 and Phase 2 to perform systematic root cause analysis before attempting any fixes. Trigger phrases: "debug", "investigate", "failing tests", "crash", "root cause".
+description: 'Use when RLM requirement involves debugging a bug, test failure, or unexpected behavior. Insert Phase 1.5 between Phase 1 and Phase 2 to perform systematic root cause analysis before attempting any fixes. Trigger phrases: "debug", "investigate", "failing tests", "crash", "root cause".'
 ---
 
 # RLM Systematic Debugging (Phase 1.5)
@@ -473,7 +473,6 @@ Based on root cause analysis:
 - **TRIGGERS:** When requirement involves debugging/fixing
 - **OUTPUT:** `01.5-root-cause.md` artifact
 - **NEXT:** Phase 3 (TO-BE Plan) incorporates findings
-
 
 
 

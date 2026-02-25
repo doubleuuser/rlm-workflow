@@ -1,6 +1,6 @@
 ---
 name: rlm-subagent
-description: Master skill for parallel subagent-driven execution with automatic fallback to single-agent sequential mode. Use when implementing plans with multiple independent sub-phases (SP1, SP2...) to dispatch parallel subagents, or when requiring code review between implementation and testing. Trigger phrases: "parallelize", "dispatch subagent", "split into sub-phases", "code review subagent", "parallel testing".
+description: 'Master skill for parallel subagent-driven execution with automatic fallback to single-agent sequential mode. Use when implementing plans with multiple independent sub-phases (SP1, SP2...) to dispatch parallel subagents, or when requiring code review between implementation and testing. Trigger phrases: "parallelize", "dispatch subagent", "split into sub-phases", "code review subagent", "parallel testing".'
 ---
 
 # Subagent-Driven Execution with Fallback
@@ -375,4 +375,3 @@ Subagent available? ──NO──► SEQUENTIAL MODE
 - Implementer subagent: `agents/implementer.md`
 - Code reviewer subagent: `agents/code-reviewer.md`
 - Artifact templates: `references/artifact-template.md`
-
