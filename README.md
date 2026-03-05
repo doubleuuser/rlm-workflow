@@ -248,15 +248,29 @@ pwsh -NoProfile -File "<SKILL_DIR>/scripts/verify-locks.ps1" -RepoRoot . -RunId 
 
 Find the installed location via `npx skills list` (or use project-local install so `<SKILL_DIR>` is under `.agents/skills/...`).
 
+### Run Initialization
+
+Create a run folder with `addenda/` and standardized `evidence/` subfolders, plus a `00-requirements.md` template:
+
+```powershell
+# Windows PowerShell:
+powershell -ExecutionPolicy Bypass -File "<SKILL_DIR>/scripts/rlm-init.ps1" -RepoRoot . -RunId "<run-id>" -Template feature
+
+# PowerShell 7+ (pwsh):
+pwsh -NoProfile -File "<SKILL_DIR>/scripts/rlm-init.ps1" -RepoRoot . -RunId "<run-id>" -Template feature
+```
+
 ### Run Status
 
 Show current run phase, lock chain progress, and evidence folder status:
 
 ```powershell
-# Verify a specific run
-pwsh -NoProfile -File "<SKILL_DIR>/scripts/rlm-status.ps1" -RepoRoot . -RunId "<run-id>"
+# Windows PowerShell:
+powershell -ExecutionPolicy Bypass -File "<SKILL_DIR>/scripts/rlm-status.ps1" -RepoRoot . -RunId "<run-id>"
+powershell -ExecutionPolicy Bypass -File "<SKILL_DIR>/scripts/rlm-status.ps1" -RepoRoot .
 
-# Default to most recent run
+# PowerShell 7+ (pwsh):
+pwsh -NoProfile -File "<SKILL_DIR>/scripts/rlm-status.ps1" -RepoRoot . -RunId "<run-id>"
 pwsh -NoProfile -File "<SKILL_DIR>/scripts/rlm-status.ps1" -RepoRoot .
 ```
 
@@ -265,9 +279,14 @@ pwsh -NoProfile -File "<SKILL_DIR>/scripts/rlm-status.ps1" -RepoRoot .
 Lint artifacts for required header fields, required sections, and TODO completion rules (especially before locking):
 
 ```powershell
+# Windows PowerShell:
+powershell -ExecutionPolicy Bypass -File "<SKILL_DIR>/scripts/lint-rlm-run.ps1" -RepoRoot . -RunId "<run-id>"
+
+# PowerShell 7+ (pwsh):
 pwsh -NoProfile -File "<SKILL_DIR>/scripts/lint-rlm-run.ps1" -RepoRoot . -RunId "<run-id>"
 
-# Treat WARN as FAIL
+# Treat WARN as FAIL (both):
+powershell -ExecutionPolicy Bypass -File "<SKILL_DIR>/scripts/lint-rlm-run.ps1" -RepoRoot . -RunId "<run-id>" -Strict
 pwsh -NoProfile -File "<SKILL_DIR>/scripts/lint-rlm-run.ps1" -RepoRoot . -RunId "<run-id>" -Strict
 ```
 

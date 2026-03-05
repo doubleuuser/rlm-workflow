@@ -323,6 +323,7 @@ Before setting `Status: LOCKED`:
   - `references/rationalizations.md` - Common excuse/reality tables
 - Scripts (utilities):
   - `scripts/verify-locks.ps1` - Automated lock hash verification
+  - `scripts/rlm-init.ps1` - Initialize a new run folder + templates
   - `scripts/rlm-status.ps1` - Run status + lock chain summary
   - `scripts/lint-rlm-run.ps1` - Artifact structure + TODO discipline linter
 

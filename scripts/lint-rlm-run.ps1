@@ -329,13 +329,34 @@ function Lint-ArtifactFile {
     # Evidence directory convention checks (Phase 4/5).
     if ($fileName -in @("04-test-summary.md", "05-manual-qa.md")) {
         $evidenceDir = Join-Path $RunDir "evidence"
+        $requiredEvidenceSubdirs = @("screenshots", "logs", "perf", "traces")
+
         if (-not (Test-Path -LiteralPath $evidenceDir)) {
             $warnCount++
             Write-Issue -Severity "WARN" -FilePath $FilePath -Message ("Evidence directory missing at {0}" -f $evidenceDir) -RemediationLines @(
                 ('New-Item -ItemType Directory -Force -Path "{0}"' -f (Join-Path $evidenceDir "screenshots")),
                 ('New-Item -ItemType Directory -Force -Path "{0}"' -f (Join-Path $evidenceDir "logs")),
-                ('New-Item -ItemType Directory -Force -Path "{0}"' -f (Join-Path $evidenceDir "perf"))
+                ('New-Item -ItemType Directory -Force -Path "{0}"' -f (Join-Path $evidenceDir "perf")),
+                ('New-Item -ItemType Directory -Force -Path "{0}"' -f (Join-Path $evidenceDir "traces")),
+                ('New-Item -ItemType Directory -Force -Path "{0}"' -f (Join-Path $evidenceDir "other"))
             )
+        } else {
+            $missingSubdirs = New-Object System.Collections.Generic.List[string]
+            foreach ($subdir in $requiredEvidenceSubdirs) {
+                $subPath = Join-Path $evidenceDir $subdir
+                if (-not (Test-Path -LiteralPath $subPath)) {
+                    $missingSubdirs.Add($subdir)
+                }
+            }
+
+            if ($missingSubdirs.Count -gt 0) {
+                $warnCount++
+                $remediation = New-Object System.Collections.Generic.List[string]
+                foreach ($subdir in $missingSubdirs) {
+                    $remediation.Add(('New-Item -ItemType Directory -Force -Path "{0}"' -f (Join-Path $evidenceDir $subdir)))
+                }
+                Write-Issue -Severity "WARN" -FilePath $FilePath -Message ("Evidence subfolder(s) missing under {0}: {1}" -f $evidenceDir, ($missingSubdirs -join ", ")) -RemediationLines $remediation.ToArray()
+            }
         }
     }
 

@@ -17,7 +17,8 @@ This guide is intentionally prescriptive so two different agents produce equival
 - [Quick Start Checklist](#quick-start-checklist)
 - [Rationalization Awareness](#rationalization-awareness)
 - [Required Header (All Artifacts)](#required-header-all-artifacts)
-- [Universal Sections (All Artifacts Except Phase 1 Optional Traceability)](#universal-sections-all-artifacts-except-phase-1-optional-traceability)
+- [Universal Sections (All Artifacts Except `00-requirements.md`)](#universal-sections-all-artifacts-except-00-requirementsmd)
+- [Evidence Directory (Per Run)](#evidence-directory-per-run)
 - [Phase-by-Phase Authoring Templates](#phase-by-phase-authoring-templates)
 - [Phase 0 Template (`00-worktree.md`) - Isolation REQUIRED](#phase-0-template-00-worktreemd---isolation-required)
 - [Phase 0 Requirements Template (`00-requirements.md`)](#phase-0-requirements-template-00-requirementsmd)
@@ -31,6 +32,7 @@ This guide is intentionally prescriptive so two different agents produce equival
 - [Addenda Templates](#addenda-templates)
 - [Stage-Local Addendum](#stage-local-addendum)
 - [Upstream-Gap Addendum](#upstream-gap-addendum)
+- [Artifact Linting (Structure + TODO Discipline)](#artifact-linting-structure--todo-discipline)
 - [Locking Commands](#locking-commands)
 - [Common Failure Modes (Use as Pre-Lock Checklist)](#common-failure-modes-use-as-pre-lock-checklist)
 - [Lock Verification](#lock-verification)
@@ -106,9 +108,9 @@ LockedAt: `YYYY-MM-DDTHH:MM:SSZ`
 LockHash: `<sha256-hex>`
 ```
 
-## Universal Sections (All Artifacts Except Phase 1 Optional Traceability)
+## Universal Sections (All Artifacts Except `00-requirements.md`)
 
-Phase 1 may omit Traceability, but every later artifact must include it.
+Traceability is not required in `00-requirements.md`, but every downstream artifact (Phase 1+) must include it.
 
 ```md
 ## Traceability
@@ -342,7 +344,6 @@ Scope note: This document defines stable requirement identifiers and acceptance 
 - [ ] Write acceptance criteria for each requirement
 - [ ] Document out of scope items (OOS1, OOS2, ...)
 - [ ] List constraints and assumptions
-- [ ] Create traceability mapping
 - [ ] Complete Coverage Gate checklist
 - [ ] Complete Approval Gate checklist
 
@@ -403,6 +404,7 @@ Scope note: This document captures current behavior and evidence before changes.
 ## TODO
 
 - [ ] Read and understand requirements from Phase 1
+- [ ] Read and understand requirements from Phase 0
 - [ ] Create novice-runnable reproduction steps
 - [ ] Document current behavior for each requirement (R1, R2, ...)
 - [ ] Identify and record relevant code pointers

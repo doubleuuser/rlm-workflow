@@ -57,6 +57,7 @@ Each RLM run uses a stable folder:
 Required per-run artifacts:
 
 - `00-requirements.md`
+- `00-worktree.md` (REQUIRED - worktree isolation)
 - `01-as-is.md`
 - `02-to-be-plan.md`
 - `03-implementation-summary.md`

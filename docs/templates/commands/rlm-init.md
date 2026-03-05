@@ -8,6 +8,20 @@
 Initialize RLM run: <run-id> [options]
 ```
 
+## Script (Recommended)
+
+If you have the skill installed, you can scaffold a run directly from the project repo root:
+
+```powershell
+# Windows PowerShell:
+powershell -ExecutionPolicy Bypass -File "<SKILL_DIR>/scripts/rlm-init.ps1" -RepoRoot . -RunId "<run-id>" -Template feature
+powershell -ExecutionPolicy Bypass -File "<SKILL_DIR>/scripts/rlm-init.ps1" -RepoRoot . -RunId "<run-id>" -Template bugfix -FromIssue "#123"
+
+# PowerShell 7+ (pwsh):
+pwsh -NoProfile -File "<SKILL_DIR>/scripts/rlm-init.ps1" -RepoRoot . -RunId "<run-id>" -Template feature
+pwsh -NoProfile -File "<SKILL_DIR>/scripts/rlm-init.ps1" -RepoRoot . -RunId "<run-id>" -Template bugfix -FromIssue "#123"
+```
+
 ## Arguments
 
 - `run-id` - Unique identifier for this run (e.g., "2026-02-21-user-auth")

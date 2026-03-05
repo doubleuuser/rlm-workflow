@@ -13,10 +13,12 @@ Check RLM status: [run-id]
 If you have the skill installed, you can run the status utility directly from the project repo root:
 
 ```powershell
-# Verify a specific run
-pwsh -NoProfile -File "<SKILL_DIR>/scripts/rlm-status.ps1" -RepoRoot . -RunId "<run-id>"
+# Windows PowerShell:
+powershell -ExecutionPolicy Bypass -File "<SKILL_DIR>/scripts/rlm-status.ps1" -RepoRoot . -RunId "<run-id>"
+powershell -ExecutionPolicy Bypass -File "<SKILL_DIR>/scripts/rlm-status.ps1" -RepoRoot .
 
-# Default to most recent run
+# PowerShell 7+ (pwsh):
+pwsh -NoProfile -File "<SKILL_DIR>/scripts/rlm-status.ps1" -RepoRoot . -RunId "<run-id>"
 pwsh -NoProfile -File "<SKILL_DIR>/scripts/rlm-status.ps1" -RepoRoot .
 ```
 

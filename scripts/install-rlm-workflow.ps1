@@ -140,12 +140,22 @@ $agentsBlock = @(
   '',
   'Primary run artifacts live in:',
   '- `/.codex/rlm/<run-id>/00-requirements.md`',
+  '- `/.codex/rlm/<run-id>/00-worktree.md`',
   '- `/.codex/rlm/<run-id>/01-as-is.md`',
+  '- `/.codex/rlm/<run-id>/01.5-root-cause.md` (optional)',
   '- `/.codex/rlm/<run-id>/02-to-be-plan.md`',
   '- `/.codex/rlm/<run-id>/03-implementation-summary.md`',
+  '- `/.codex/rlm/<run-id>/03.5-code-review.md` (optional)',
   '- `/.codex/rlm/<run-id>/04-test-summary.md`',
   '- `/.codex/rlm/<run-id>/05-manual-qa.md`',
-  '- `/.codex/rlm/<run-id>/addenda/`'
+  '- `/.codex/rlm/<run-id>/addenda/`',
+  '- `/.codex/rlm/<run-id>/evidence/`',
+  '',
+  'Useful utilities (in the installed `rlm-workflow` skill):',
+  '- `scripts/rlm-init.ps1` - initialize a new run folder + templates',
+  '- `scripts/rlm-status.ps1` - run status + lock chain summary',
+  '- `scripts/lint-rlm-run.ps1` - artifact structure + TODO discipline linter',
+  '- `scripts/verify-locks.ps1` - verify LockHash integrity for locked artifacts'
 ) -join "`r`n"
 
 Upsert-MarkedBlock `
