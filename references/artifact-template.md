@@ -152,6 +152,19 @@ Approval: PASS
 
 If either gate fails, set `FAIL` and list exact fixes required before proceeding.
 
+## Evidence Directory (Per Run)
+
+To keep Phase 4/5 fast and reproducible, store all non-Markdown evidence artifacts under a standard folder:
+
+- `/.codex/rlm/<run-id>/evidence/`
+  - `screenshots/` (UI screenshots, failure screenshots)
+  - `logs/` (console/server/CI excerpts)
+  - `perf/` (profiles, measurements, benchmarks)
+  - `traces/` (Playwright traces, HARs; if applicable)
+  - `other/` (fallback)
+
+Reference these artifacts in Phase 3/4/5 using repo-relative paths.
+
 ## Phase-by-Phase Authoring Templates
 
 ## Phase 0 Template (`00-worktree.md`) - Isolation REQUIRED
@@ -972,7 +985,7 @@ Approval: PASS / FAIL
 Required outcome:
 - exact commands executed
 - pass/fail outcomes
-- evidence artifact locations
+- evidence artifact locations (standardized under `/.codex/rlm/<run-id>/evidence/`)
 - flake/retry notes
 - parallel test execution summary (if applicable)
 
@@ -1030,6 +1043,15 @@ Scope note: This document records test execution evidence and readiness.
 - Passed:
 - Failed:
 - Skipped:
+
+## Evidence and Artifacts
+
+Store and reference artifacts under:
+- `/.codex/rlm/<run-id>/evidence/`
+  - `evidence/screenshots/`
+  - `evidence/logs/`
+  - `evidence/perf/`
+  - `evidence/traces/` (if applicable)
 
 ## By Sub-phase
 
@@ -1111,6 +1133,14 @@ Scope note: This document records user-validated QA outcomes and sign-off.
 | --- | --- | --- | --- | --- |
 | ... | ... | ... | ... | ... |
 
+## Evidence and Artifacts
+
+Store and reference artifacts under:
+- `/.codex/rlm/<run-id>/evidence/`
+  - `evidence/screenshots/` (screenshots, videos-as-files)
+  - `evidence/logs/` (console/server output excerpts)
+  - `evidence/perf/` (if QA included perf checks)
+
 ## User Sign-Off
 
 - Approved by:
@@ -1148,6 +1178,13 @@ Outputs:
 - `/.codex/rlm/<run-id>/addenda/<base>.addendum-01.md`
 Scope note: This addendum supplements phase-local content without changing locked history.
 
+## TODO
+
+- [ ] Add the missing information
+- [ ] Update Traceability/Coverage implications in the current phase artifact (if needed)
+- [ ] Complete Coverage Gate checklist
+- [ ] Complete Approval Gate checklist
+
 ## Addendum Content
 
 - Added/clarified information:
@@ -1179,6 +1216,15 @@ Outputs:
 - `/.codex/rlm/<run-id>/addenda/<current>.upstream-gap.<prior>.addendum-01.md`
 Scope note: This addendum records a discovered gap in a locked upstream artifact.
 
+## TODO
+
+- [ ] Record the upstream gap precisely
+- [ ] Add discovery evidence (commands, files, outputs)
+- [ ] State impact and compensation plan
+- [ ] Update current-phase planning/implementation accordingly
+- [ ] Complete Coverage Gate checklist
+- [ ] Complete Approval Gate checklist
+
 ## Gap Statement
 
 - Missing or incorrect upstream content:
@@ -1208,6 +1254,21 @@ Coverage: PASS
 ## Approval Gate
 ...
 Approval: PASS
+```
+
+## Artifact Linting (Structure + TODO Discipline)
+
+Before locking (or when a lock verification fails unexpectedly), lint the run artifacts for required header fields, required section headings, and TODO completion rules:
+
+```powershell
+# Lint specific run
+.\.agents\skills\rlm-workflow\scripts\lint-rlm-run.ps1 -RunId "<run-id>"
+# Or, when running from this repo:
+.\scripts\lint-rlm-run.ps1 -RunId "<run-id>"
+
+# Treat WARN as FAIL
+.\.agents\skills\rlm-workflow\scripts\lint-rlm-run.ps1 -RunId "<run-id>" -Strict
+.\scripts\lint-rlm-run.ps1 -RunId "<run-id>" -Strict
 ```
 
 ## Locking Commands

@@ -63,6 +63,7 @@ Required per-run artifacts:
 - `04-test-summary.md`
 - `05-manual-qa.md`
 - `addenda/` (see Addenda policy)
+- `evidence/` (standardized evidence artifacts; screenshots/logs/perf/traces)
 
 The run folder is the durable record for the requirement. It must be sufficient to understand and reproduce work without relying on chat logs.
 
@@ -788,6 +789,16 @@ Playwright evidence must be sufficient to debug without guesswork.
 - Prefer to have traces available for failures. If traces are not always-on, ensure they are captured on the first retry for failures (or equivalent policy supported by the repo).
 - Screenshots on failure are strongly recommended.
 - Videos on failure are recommended for interaction-heavy flows.
+
+Standardize where evidence lives (per run):
+
+- Store non-Markdown evidence artifacts under `/.codex/rlm/<run-id>/evidence/`:
+  - `evidence/screenshots/`
+  - `evidence/logs/`
+  - `evidence/perf/`
+  - `evidence/traces/` (if applicable)
+- Phase 4 and Phase 5 artifacts must reference concrete repo-relative paths under `evidence/`.
+- If the repo generates artifacts elsewhere (e.g., Playwright `test-results/`), either configure output to point at the run folder (preferred) or copy/link the relevant files into the run’s `evidence/` directory.
 
 If the repo’s Playwright configuration does not currently produce these artifacts, the plan may introduce minimal, non-invasive configuration changes to enable them (without changing product behavior). Such changes must be recorded in the Decision Log and reflected in the test summary.
 

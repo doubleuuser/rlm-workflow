@@ -248,6 +248,41 @@ pwsh -NoProfile -File "<SKILL_DIR>/scripts/verify-locks.ps1" -RepoRoot . -RunId 
 
 Find the installed location via `npx skills list` (or use project-local install so `<SKILL_DIR>` is under `.agents/skills/...`).
 
+### Run Status
+
+Show current run phase, lock chain progress, and evidence folder status:
+
+```powershell
+# Verify a specific run
+pwsh -NoProfile -File "<SKILL_DIR>/scripts/rlm-status.ps1" -RepoRoot . -RunId "<run-id>"
+
+# Default to most recent run
+pwsh -NoProfile -File "<SKILL_DIR>/scripts/rlm-status.ps1" -RepoRoot .
+```
+
+### Artifact Linting (Structure + TODO Discipline)
+
+Lint artifacts for required header fields, required sections, and TODO completion rules (especially before locking):
+
+```powershell
+pwsh -NoProfile -File "<SKILL_DIR>/scripts/lint-rlm-run.ps1" -RepoRoot . -RunId "<run-id>"
+
+# Treat WARN as FAIL
+pwsh -NoProfile -File "<SKILL_DIR>/scripts/lint-rlm-run.ps1" -RepoRoot . -RunId "<run-id>" -Strict
+```
+
+### Evidence Directory Convention
+
+Store non-Markdown evidence artifacts under:
+
+- `.codex/rlm/<run-id>/evidence/`
+  - `screenshots/` (UI screenshots, failure screenshots)
+  - `logs/` (console/server/CI excerpts)
+  - `perf/` (profiles, measurements, benchmarks)
+  - `traces/` (Playwright traces, HARs; if applicable)
+
+Reference these paths from Phase 4 (`04-test-summary.md`) and Phase 5 (`05-manual-qa.md`).
+
 ### Worktree Status
 
 Check if you're in an isolated worktree:

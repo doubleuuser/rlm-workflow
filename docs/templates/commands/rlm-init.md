@@ -20,7 +20,8 @@ Creates a new RLM run folder with scaffolding:
 
 1. Creates `.codex/rlm/<run-id>/` directory
 2. Generates `00-requirements.md` template
-3. Optionally populates from issue template
+3. Creates `addenda/` and `evidence/` directories (with standard subfolders)
+4. Optionally populates from issue template
 
 ## Example
 
@@ -33,6 +34,7 @@ Initialize RLM run: 2026-02-21-add-oauth --template feature
 After running this command:
 - Directory: `.codex/rlm/2026-02-21-add-oauth/`
 - Template: `.codex/rlm/2026-02-21-add-oauth/00-requirements.md`
+- Evidence: `.codex/rlm/2026-02-21-add-oauth/evidence/{screenshots,logs,perf,traces}/`
 
 Next step: Edit the requirements file, then run:
 ```
