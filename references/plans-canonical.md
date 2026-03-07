@@ -48,6 +48,15 @@ RLM uses two global documents shared by all requirements:
 
 These two files are updated in later phases (see Phase 6 and Phase 7).
 
+Required read behavior:
+
+- At the start of every new session, read `/.codex/STATE.md` to understand the current state of the app and codebase.
+- At the start of every new session, read `/.codex/DECISIONS.md` to understand prior work and the reasoning behind it.
+- At the start of every new RLM run, re-read `/.codex/STATE.md` and `/.codex/DECISIONS.md` before creating or updating run artifacts.
+- At the start of every new RLM run, use `/.codex/DECISIONS.md` to identify any prior RLM runs relevant to the new requirement or AS-IS analysis.
+- If relevant prior runs are found, read only the docs needed from those runs to understand the affected codebase areas before writing the new run artifacts.
+- If no relevant prior runs are identified, skip that step.
+
 ## RLM run directory layout (per requirement)
 
 Each RLM run uses a stable folder:
@@ -67,6 +76,8 @@ Required per-run artifacts:
 - `evidence/` (standardized evidence artifacts; screenshots/logs/perf/traces)
 
 The run folder is the durable record for the requirement. It must be sufficient to understand and reproduce work without relying on chat logs.
+
+When beginning a new run, use `/.codex/DECISIONS.md` to locate earlier run folders relevant to the current requirement or AS-IS analysis. If any are found, read only the prior run artifacts most relevant to the same subsystem, workflow, or architectural area being changed. If none are found, skip this step.
 
 ## RLM phases
 
