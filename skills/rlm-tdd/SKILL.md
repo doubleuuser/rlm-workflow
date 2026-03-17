@@ -176,7 +176,7 @@ After green only:
 - All tests still passing: ✅
 ```
 
-## Common Rationalizations (STOP - You're Rationalizing)
+## Common Process Shortcuts (STOP)
 
 | Excuse | Reality |
 |--------|---------|
@@ -333,4 +333,3 @@ Result: 47 passing, 0 failing
 ## References
 
 - **REQUIRED:** Follow this skill for all Phase 3 implementation work
-- **SEE ALSO:** `references/rationalizations.md` for extended excuse/reality table

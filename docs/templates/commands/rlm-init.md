@@ -11,8 +11,15 @@ Initialize RLM run: <run-id> [options]
 ## Script (Recommended)
 
 If you have the skill installed, you can scaffold a run directly from the project repo root:
+Python is cross-platform; PowerShell commands are equivalent.
 
 ```powershell
+# Python (Windows/macOS/Linux):
+python "<SKILL_DIR>/scripts/rlm-init.py" --repo-root . --run-id "<run-id>" --template feature
+python "<SKILL_DIR>/scripts/rlm-init.py" --repo-root . --run-id "<run-id>" --template bugfix --from-issue "#123"
+python3 "<SKILL_DIR>/scripts/rlm-init.py" --repo-root . --run-id "<run-id>" --template feature
+python3 "<SKILL_DIR>/scripts/rlm-init.py" --repo-root . --run-id "<run-id>" --template bugfix --from-issue "#123"
+
 # Windows PowerShell:
 powershell -ExecutionPolicy Bypass -File "<SKILL_DIR>/scripts/rlm-init.ps1" -RepoRoot . -RunId "<run-id>" -Template feature
 powershell -ExecutionPolicy Bypass -File "<SKILL_DIR>/scripts/rlm-init.ps1" -RepoRoot . -RunId "<run-id>" -Template bugfix -FromIssue "#123"

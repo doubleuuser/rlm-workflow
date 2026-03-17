@@ -57,6 +57,9 @@ function Upsert-MarkedBlock {
   $existing = ""
   if (Test-Path -LiteralPath $FilePath) {
     $existing = Get-Content -LiteralPath $FilePath -Raw -Encoding UTF8
+    if ($null -eq $existing) {
+      $existing = ""
+    }
   }
 
   $block = "$StartMarker`r`n$BlockBody`r`n$EndMarker"
@@ -93,10 +96,13 @@ $agentDir = Join-Path $resolvedRepoRoot ".agent"
 $rlmDir = Join-Path $codexDir "rlm"
 $skillRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
 $canonicalPlansPath = Join-Path (Join-Path $skillRoot "references") "plans-canonical.md"
+$agentsBlockPath = Join-Path (Join-Path $skillRoot "references") "agents-block.md"
 $agentsPath = Join-Path $codexDir "AGENTS.md"
 $decisionsPath = Join-Path $codexDir "DECISIONS.md"
 $statePath = Join-Path $codexDir "STATE.md"
 $plansPath = Join-Path $agentDir "PLANS.md"
+$plansStartMarker = "<!-- RLM-WORKFLOW-PLANS:START -->"
+$plansEndMarker = "<!-- RLM-WORKFLOW-PLANS:END -->"
 
 Ensure-Directory -Path $codexDir
 Ensure-Directory -Path $agentDir
@@ -120,55 +126,12 @@ Ensure-File -Path $statePath -Content @"
 Ensure-File -Path $agentsPath -Content @"
 # AGENTS.md
 "@
-if (Test-Path -LiteralPath $canonicalPlansPath) {
-  $seedPlans = Get-Content -LiteralPath $canonicalPlansPath -Raw -Encoding UTF8
-  if (-not [string]::IsNullOrWhiteSpace($seedPlans)) {
-    Ensure-File -Path $plansPath -Content ($seedPlans.TrimEnd("`r", "`n") + "`r`n")
-  } else {
-    Ensure-File -Path $plansPath -Content "## Canonical location`r`n"
-  }
-} else {
-  Ensure-File -Path $plansPath -Content "## Canonical location`r`n"
-}
+Ensure-File -Path $plansPath -Content ""
 
-$agentsBlock = @(
-  '## RLM Workflow Skill',
-  '',
-  'This repository uses the `rlm-workflow` skill to execute the repo-document RLM workflow.',
-  'Canonical workflow rules are defined in `/.agent/PLANS.md`.',
-  "Triggers on RLM requests like Implement requirement 'run-id' and phase-specific commands.",
-  '',
-  'At the start of every new session, read these files before doing RLM work:',
-  '- `/.codex/STATE.md` - understand the current state of the app and codebase',
-  '- `/.codex/DECISIONS.md` - understand past work and why prior changes were made',
-  '',
-  'At the start of every new RLM run, re-read these files before drafting or executing the run:',
-  '- `/.codex/STATE.md`',
-  '- `/.codex/DECISIONS.md`',
-  '',
-  'When starting a new run, use `/.codex/DECISIONS.md` to identify prior RLM runs related to the new requirement or AS-IS analysis, if any.',
-  'If relevant prior runs are found, read only the docs needed to understand those affected codebase areas before writing the new run artifacts.',
-  'If no relevant prior runs are identified from `/.codex/DECISIONS.md`, skip that step.',
-  '',
-  'Primary run artifacts live in:',
-  '- `/.codex/rlm/<run-id>/00-requirements.md`',
-  '- `/.codex/rlm/<run-id>/00-worktree.md`',
-  '- `/.codex/rlm/<run-id>/01-as-is.md`',
-  '- `/.codex/rlm/<run-id>/01.5-root-cause.md` (optional)',
-  '- `/.codex/rlm/<run-id>/02-to-be-plan.md`',
-  '- `/.codex/rlm/<run-id>/03-implementation-summary.md`',
-  '- `/.codex/rlm/<run-id>/03.5-code-review.md` (optional)',
-  '- `/.codex/rlm/<run-id>/04-test-summary.md`',
-  '- `/.codex/rlm/<run-id>/05-manual-qa.md`',
-  '- `/.codex/rlm/<run-id>/addenda/`',
-  '- `/.codex/rlm/<run-id>/evidence/`',
-  '',
-  'Useful utilities (in the installed `rlm-workflow` skill):',
-  '- `scripts/rlm-init.ps1` - initialize a new run folder + templates',
-  '- `scripts/rlm-status.ps1` - run status + lock chain summary',
-  '- `scripts/lint-rlm-run.ps1` - artifact structure + TODO discipline linter',
-  '- `scripts/verify-locks.ps1` - verify LockHash integrity for locked artifacts'
-) -join "`r`n"
+if (-not (Test-Path -LiteralPath $agentsBlockPath)) {
+  throw "Missing shared AGENTS block template: $agentsBlockPath"
+}
+$agentsBlock = (Get-Content -LiteralPath $agentsBlockPath -Raw -Encoding UTF8).TrimEnd("`r", "`n")
 
 Upsert-MarkedBlock `
   -FilePath $agentsPath `
@@ -180,13 +143,28 @@ if (-not $SkipPlansUpdate) {
   if (Test-Path -LiteralPath $canonicalPlansPath) {
     $plansBlock = Get-Content -LiteralPath $canonicalPlansPath -Raw -Encoding UTF8
     if (-not [string]::IsNullOrWhiteSpace($plansBlock)) {
-      $normalizedCanonical = $plansBlock.TrimEnd("`r", "`n") + "`r`n"
+      $plansBody = $plansBlock.TrimEnd("`r", "`n")
+      $normalizedCanonical = $plansBody + "`r`n"
       $existingPlans = Get-Content -LiteralPath $plansPath -Raw -Encoding UTF8
-      if ($existingPlans -ne $normalizedCanonical) {
-        Write-Utf8NoBom -Path $plansPath -Content $normalizedCanonical
-        Write-Output "[OK] Synced .agent/PLANS.md from canonical template: $canonicalPlansPath"
+      if ($null -eq $existingPlans) {
+        $existingPlans = ""
+      }
+      $normalizedExisting = ""
+      if (-not [string]::IsNullOrEmpty($existingPlans)) {
+        $normalizedExisting = $existingPlans.TrimEnd("`r", "`n") + "`r`n"
+      }
+
+      $plansPattern = "(?s)$([regex]::Escape($plansStartMarker)).*?$([regex]::Escape($plansEndMarker))"
+      if ((-not [regex]::IsMatch($existingPlans, $plansPattern)) -and ($normalizedExisting -eq $normalizedCanonical)) {
+        $wrappedCanonical = "$plansStartMarker`r`n$plansBody`r`n$plansEndMarker`r`n"
+        Write-Utf8NoBom -Path $plansPath -Content $wrappedCanonical
+        Write-Output "[OK] Migrated .agent/PLANS.md to managed upsert block format."
       } else {
-        Write-Output "[OK] File already up to date: $plansPath"
+        Upsert-MarkedBlock `
+          -FilePath $plansPath `
+          -StartMarker $plansStartMarker `
+          -EndMarker $plansEndMarker `
+          -BlockBody $plansBody
       }
     } else {
       Write-Output "[INFO] Skipped PLANS update: canonical plans file is empty at $canonicalPlansPath"

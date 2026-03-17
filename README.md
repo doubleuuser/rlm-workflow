@@ -1,6 +1,6 @@
 # RLM Workflow
 
-A multi-platform Recursive Language Models (RLM) workflow for AI-assisted software development with strict phase gates, TDD discipline, and systematic debugging.
+A stage-gated Recursive Language Models (RLM) workflow for AI-assisted software development with strict phase gates, TDD discipline, and systematic debugging.
 
 Distributed as Agent Skills; install via Skills CLI (works across supported agents).
 
@@ -52,13 +52,23 @@ powershell -ExecutionPolicy Bypass -File "<SKILL_DIR>/scripts/install-rlm-workfl
 
 # PowerShell 7+ (pwsh):
 pwsh -NoProfile -File "<SKILL_DIR>/scripts/install-rlm-workflow.ps1" -RepoRoot .
+
+# Python (Windows/macOS/Linux):
+python "<SKILL_DIR>/scripts/install-rlm-workflow.py" --repo-root .
+# or:
+python3 "<SKILL_DIR>/scripts/install-rlm-workflow.py" --repo-root .
+
+# Bash wrapper (macOS/Linux):
+bash "<SKILL_DIR>/scripts/install-rlm-workflow.sh" --repo-root .
 ```
 
 Find the installed location via `npx skills list` (or use project-local install so `<SKILL_DIR>` is under `.agents/skills/...`).
+Bootstrap writes managed marker blocks into existing `.codex/AGENTS.md` and `.agent/PLANS.md`, preserving unrelated existing content.
+Installer bootstrap is cross-platform (`python`/`python3`/`bash` wrapper supported). Core utilities have Python equivalents (`scripts/*.py`) plus PowerShell equivalents (`scripts/*.ps1`).
 
 ## 1. Introduction to RLM-workflow
 
-`rlm-workflow` is a multi-platform skill/plugin for running the repository's RLM (Recursive Language Models) workflow with strict phase gates, traceability, locking, and addenda rules.
+`rlm-workflow` is a skill/plugin for running the repository's RLM (Recursive Language Models) workflow with strict phase gates, traceability, locking, and addenda rules.
 
 rlm-workflow is inspired by the MIT paper 'Recursive Language Models'. While the paper reports increased performance, reduced context rot and an effective context window of 10 million tokens by using agents, agents are a sidetrack. The core finding is that important information such as requirements, implementation plans and current codebase analysis must NOT be part of the agent context but stored in static files. 
 
@@ -81,7 +91,6 @@ rlm-workflow uses a standard kanban-workflow with distinct phases like requireme
 - **TDD Discipline** - Strict RED-GREEN-REFACTOR cycle with The Iron Law: *No production code without a failing test first*
 - **Systematic Debugging** - Optional Phase 1.5 debug mode for bug fixes with 4-phase root cause analysis
 - **TODO Discipline** - Mandatory checkable TODOs in every phase artifact; no locking with unchecked items
-- **Rationalization Awareness** - Common excuse/reality tables to prevent corner-cutting
 
 **Execution & Scaling**
 - **Subagent-Driven Execution** - Automatic parallel execution with fallback to sequential mode
@@ -142,7 +151,7 @@ rlm-workflow uses a standard kanban-workflow with distinct phases like requireme
    - **Sequential Mode:** Extended self-review checklist
    - User input required: No.
 10. Phase 4 (`04-test-summary.md`) - Tests and validation:
-   - What it does: runs planned validation and records commands/results/evidence.
+   - What it does: audits implementation-first (Phase 3 summary vs `00-requirements.md` and `02-to-be-plan.md`), then runs planned validation and records commands/results/evidence.
    - Verifies TDD compliance: all tests from Phase 3 passing
    - **Parallel Mode:** Concurrent test suites (unit + integration + E2E)
    - **Sequential Mode:** Run test suites sequentially
@@ -184,6 +193,7 @@ When subagent spawning is available (Claude Code `Task` tool, Codex native subag
 - Fixes loop until approved
 
 **Phase 4 - Parallel Testing:**
+- Controller performs pre-test implementation audit (`03-implementation-summary.md` vs `00-requirements.md` + `02-to-be-plan.md`)
 - Subagent 1: Unit tests
 - Subagent 2: Integration tests
 - Subagent 3: E2E Tier A
@@ -222,7 +232,7 @@ When subagents are unavailable (platform limitation, user request):
 - Locks artifacts only when gates pass, with `LockedAt` and `LockHash`.
 - Enforces hard-stop phase transition checks so later phases cannot run unless prior phases are lock-valid.
 - Enforces strict phase isolation: only one active/DRAFT phase is allowed per run.
-- Handles manual QA pause/resume behavior for Phase 6.
+- Handles manual QA pause/resume behavior for Phase 5.
 
 ## 5. Verification & Safety
 
@@ -233,6 +243,16 @@ Verify integrity of locked artifacts:
 `LockHash` is computed from a canonical normalized form of the artifact text (LF newlines, with the `LockHash:` line removed). Use the provided verifier script rather than hashing the raw file bytes directly.
 
 ```powershell
+# Python verifier (cross-platform)
+python "<SKILL_DIR>/scripts/verify-locks.py" --repo-root . --run-id "<run-id>"
+python "<SKILL_DIR>/scripts/verify-locks.py" --repo-root .
+python "<SKILL_DIR>/scripts/verify-locks.py" --repo-root . --run-id "<run-id>" --fix
+python3 "<SKILL_DIR>/scripts/verify-locks.py" --repo-root . --run-id "<run-id>"
+python3 "<SKILL_DIR>/scripts/verify-locks.py" --repo-root .
+python3 "<SKILL_DIR>/scripts/verify-locks.py" --repo-root . --run-id "<run-id>" --fix
+
+# PowerShell verifier (equivalent)
+
 # Verify specific run
 powershell -ExecutionPolicy Bypass -File "<SKILL_DIR>/scripts/verify-locks.ps1" -RepoRoot . -RunId "<run-id>"
 pwsh -NoProfile -File "<SKILL_DIR>/scripts/verify-locks.ps1" -RepoRoot . -RunId "<run-id>"
@@ -253,6 +273,10 @@ Find the installed location via `npx skills list` (or use project-local install 
 Create a run folder with `addenda/` and standardized `evidence/` subfolders, plus a `00-requirements.md` template:
 
 ```powershell
+# Python (cross-platform):
+python "<SKILL_DIR>/scripts/rlm-init.py" --repo-root . --run-id "<run-id>" --template feature
+python3 "<SKILL_DIR>/scripts/rlm-init.py" --repo-root . --run-id "<run-id>" --template feature
+
 # Windows PowerShell:
 powershell -ExecutionPolicy Bypass -File "<SKILL_DIR>/scripts/rlm-init.ps1" -RepoRoot . -RunId "<run-id>" -Template feature
 
@@ -265,6 +289,12 @@ pwsh -NoProfile -File "<SKILL_DIR>/scripts/rlm-init.ps1" -RepoRoot . -RunId "<ru
 Show current run phase, lock chain progress, and evidence folder status:
 
 ```powershell
+# Python (cross-platform):
+python "<SKILL_DIR>/scripts/rlm-status.py" --repo-root . --run-id "<run-id>"
+python "<SKILL_DIR>/scripts/rlm-status.py" --repo-root .
+python3 "<SKILL_DIR>/scripts/rlm-status.py" --repo-root . --run-id "<run-id>"
+python3 "<SKILL_DIR>/scripts/rlm-status.py" --repo-root .
+
 # Windows PowerShell:
 powershell -ExecutionPolicy Bypass -File "<SKILL_DIR>/scripts/rlm-status.ps1" -RepoRoot . -RunId "<run-id>"
 powershell -ExecutionPolicy Bypass -File "<SKILL_DIR>/scripts/rlm-status.ps1" -RepoRoot .
@@ -279,6 +309,12 @@ pwsh -NoProfile -File "<SKILL_DIR>/scripts/rlm-status.ps1" -RepoRoot .
 Lint artifacts for required header fields, required sections, and TODO completion rules (especially before locking):
 
 ```powershell
+# Python (cross-platform):
+python "<SKILL_DIR>/scripts/lint-rlm-run.py" --repo-root . --run-id "<run-id>"
+python "<SKILL_DIR>/scripts/lint-rlm-run.py" --repo-root . --run-id "<run-id>" --strict
+python3 "<SKILL_DIR>/scripts/lint-rlm-run.py" --repo-root . --run-id "<run-id>"
+python3 "<SKILL_DIR>/scripts/lint-rlm-run.py" --repo-root . --run-id "<run-id>" --strict
+
 # Windows PowerShell:
 powershell -ExecutionPolicy Bypass -File "<SKILL_DIR>/scripts/lint-rlm-run.ps1" -RepoRoot . -RunId "<run-id>"
 
@@ -350,14 +386,15 @@ Hard gates (`<HG>`) are non-negotiable checkpoints that prevent skipping steps:
 
 | Gate | Condition |
 |------|-----------|
-| **HG-0** | Do NOT proceed to Phase 1 until worktree is created and verified |
-| **HG-1** | Do NOT create Phase 3 plan until Phase 2 is LOCKED |
-| **HG-2** | Do NOT plan fix until Phase 1.5 root cause analysis is complete |
+| **HG-0** | Do NOT proceed to Phase 1 or 2 until worktree is created and verified and Phase 0 is LOCKED |
+| **HG-1** | Do NOT create Phase 2 plan until Phase 1 is LOCKED (and Phase 1.5 is LOCKED when present) |
+| **HG-2** | Do NOT create TO-BE plan in debug mode until Phase 1.5 root cause analysis is complete |
 | **HG-3** | Do NOT write code until failing test is documented (TDD) |
-| **HG-4** | Do NOT proceed to QA until all tests pass |
+| **HG-4** | Do NOT proceed to Manual QA until Phase 4 test evidence is complete and Phase 4 is LOCKED |
 | **HG-5** | Do NOT update global docs until user signs off on QA |
 | **HG-6** | Do NOT start Phase N unless all prior phases are lock-valid |
 | **HG-7** | Do NOT work on main branch without explicit consent |
+| **HG-8** | Do NOT lock or advance a phase with unchecked TODO items |
 
 **If a hard gate is violated:** STOP immediately, return to the skipped phase, complete it properly, lock it, then resume.
 
@@ -376,7 +413,6 @@ Hard gates (`<HG>`) are non-negotiable checkpoints that prevent skipping steps:
 - **Enforces TDD discipline via `skills/rlm-tdd/SKILL.md`** - RED-GREEN-REFACTOR cycles, The Iron Law
 - **Supports systematic debugging via `skills/rlm-debugging/SKILL.md`** - Phase 1.5 root cause analysis
 - **Enables parallel execution via `skills/rlm-subagent/SKILL.md`** - Subagent-driven execution with sequential fallback
-- **Prevents rationalization via `references/rationalizations.md`** - Common excuse/reality tables
 - **Enforces TODO discipline** - Mandatory checkable TODOs in all phases; no locking with unchecked items
 
 ## 7. How to modify the workflow
@@ -398,15 +434,16 @@ Below are common customizations and exactly which file(s) to edit for each.
 4. Change run folder structure or artifact file names.
    - Edit: `SKILL.md` (run folder and artifact paths)
    - Edit: `references/artifact-template.md` (all template paths)
-   - Edit: `scripts/install-rlm-workflow.ps1` (scaffold and inserted path references)
+   - Edit: `scripts/install-rlm-workflow.ps1` and `scripts/install-rlm-workflow.py` (scaffold and inserted path references)
 
 5. Change what gets inserted into `.codex/AGENTS.md` and `.agent/PLANS.md`.
-   - Edit: `scripts/install-rlm-workflow.ps1` (`$agentsBlock` and PLANS upsert markers/settings)
-   - Edit: `references/plans-canonical.md` (the full PLANS content that is inserted)
+   - Edit: `references/agents-block.md` (AGENTS managed block content)
+   - Edit: `references/plans-canonical.md` (PLANS managed block content)
+   - Edit: `scripts/install-rlm-workflow.ps1` and `scripts/install-rlm-workflow.py` only for upsert markers/settings behavior
 
 6. Add or change global artifacts beyond `DECISIONS.md` and `STATE.md`.
    - Edit: `SKILL.md` (global artifacts + phase expectations)
-   - Edit: `scripts/install-rlm-workflow.ps1` (create/ensure those files)
+   - Edit: `scripts/install-rlm-workflow.ps1` and `scripts/install-rlm-workflow.py` (create/ensure those files)
    - Edit: `references/artifact-template.md` (if new required sections are needed)
 
 7. Change testing policy (TDD depth, Playwright tagging, tier commands).
@@ -420,21 +457,19 @@ Below are common customizations and exactly which file(s) to edit for each.
    - Edit: `references/plans-canonical.md` (Phase 1.5 integration)
    - Edit: `references/artifact-template.md` (Phase 1.5 template)
 
-9. Change rationalization tables.
-   - Edit: `references/rationalizations.md` (excuse/reality tables)
-   - Edit: `references/artifact-template.md` (Rationalization Awareness section)
-
-10. Change how installation/setup works.
+9. Change how installation/setup works.
    - Edit: `scripts/install-rlm-workflow.ps1`
+   - Edit: `scripts/install-rlm-workflow.py`
+   - Edit: `scripts/install-rlm-workflow.sh` (bash wrapper behavior)
    - Edit: `README.md` (installation instructions)
    - Edit: `SKILL.md` (Install Bootstrap section)
-   - Note: installer guarantees `.agent/PLANS.md` exists after installation.
+   - Note: installer guarantees `.agent/PLANS.md` exists after installation and only upserts managed blocks (never replaces unrelated existing content).
 
-11. Update end-user documentation and examples.
+10. Update end-user documentation and examples.
    - Edit: `README.md`
 
-12. Keep inserted AGENTS skills index in sync after edits.
-   - Edit: `scripts/install-rlm-workflow.ps1` (`$agentsBlock`)
+11. Keep inserted AGENTS managed block content in sync after edits.
+   - Edit: `references/agents-block.md` (single source of truth for AGENTS managed block)
    - Then re-run the installer against the target repo (see Bootstrap section)
 
 ## Optional Templates

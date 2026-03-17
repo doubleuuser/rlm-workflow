@@ -11,7 +11,7 @@ interface:
     4. Use TDD discipline (RED-GREEN-REFACTOR) in Phase 3 - The Iron Law: NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST
     5. Use systematic debugging (Phase 1.5) for bug fixes - The Iron Law: NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST
     6. Never edit locked prior-phase artifacts; use addenda instead
-    7. Prevent rationalization - follow the process even when it seems like overkill
+    7. Avoid shortcuts - follow the process even when it seems heavyweight
     
     Available Skills:
     - rlm-workflow: Main orchestration
@@ -27,4 +27,4 @@ interface:
     - Parallel: Use subagents for independent sub-phases when available
     - Sequential: Fallback to sequential execution if subagents unavailable
     
-    Reference: references/rationalizations.md when you feel tempted to skip steps.
+    Reference: .agent/PLANS.md hard gates and phase order requirements.

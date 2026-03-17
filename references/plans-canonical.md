@@ -9,11 +9,11 @@ This file is the canonical source of truth for how agents work in this repositor
 This file defines:
 
 - ExecPlans: a single, self-contained, novice-guiding execution plan for complex work.
-- RLM: a stage-gated, repo-document workflow that prevents “context rot” by making static repo documents the source of truth across phases, with explicit coverage and approval gates.
+- RLM: a stage-gated, repo-document workflow that prevents "context rot" by making static repo documents the source of truth across phases, with explicit coverage and approval gates.
 
 # RLM: Recursive Language Models workflow
 
-RLM is an extension of ExecPlans designed to prevent “context rot.” In RLM, substantive requirements and plans must live in static repository documents. Prompts must not carry requirements or plans; prompts only instruct an agent which RLM phase to execute and which repo file(s) to use as inputs and outputs.
+RLM is an extension of ExecPlans designed to prevent "context rot." In RLM, substantive requirements and plans must live in static repository documents. Prompts must not carry requirements or plans; prompts only instruct an agent which RLM phase to execute and which repo file(s) to use as inputs and outputs.
 
 RLM is recommended for: multi-step debugging, platform-specific behavior, risky refactors, migrations, or any change where an AS-IS analysis, explicit validation, and manual QA sign-off are necessary.
 
@@ -21,7 +21,7 @@ RLM is recommended for: multi-step debugging, platform-specific behavior, risky 
 
 1) Repo documents are the source of truth.
 
-At the start of each phase, the agent must read the phase input document(s) from disk (including applicable addenda; see Addenda policy below) and treat them as authoritative. Conversational context may be used only to issue commands (“run Phase 2 using these file paths”), not to carry requirements.
+At the start of each phase, the agent must read the phase input document(s) from disk (including applicable addenda; see Addenda policy below) and treat them as authoritative. Conversational context may be used only to issue commands ("run Phase 2 using these file paths"), not to carry requirements.
 
 2) Prompts are commands, not specifications.
 
@@ -29,7 +29,7 @@ Do not paste substantive requirements, acceptance criteria, test cases, or imple
 
 3) One-way phases.
 
-Within a phase, the agent may iterate on that phase’s outputs until gates pass. After advancing to the next phase, the agent must not edit prior-phase artifacts. If a later phase discovers missing or incorrect information in an earlier phase, use an addendum in the current phase (see Addenda policy).
+Within a phase, the agent may iterate on that phase's outputs until gates pass. After advancing to the next phase, the agent must not edit prior-phase artifacts. If a later phase discovers missing or incorrect information in an earlier phase, use an addendum in the current phase (see Addenda policy).
 
 4) Explicit gates are mandatory.
 
@@ -44,7 +44,7 @@ Manual QA approval requires explicit user sign-off recorded in the Manual QA art
 RLM uses two global documents shared by all requirements:
 
 - `/.codex/DECISIONS.md` — a global decision ledger and index of all completed (or aborted) runs. Each entry must reference the run folder and capture what changed and why.
-- `/.codex/STATE.md` — a global “current state of the app” document. It must reflect what is true now, not what was intended.
+- `/.codex/STATE.md` — a global "current state of the app" document. It must reflect what is true now, not what was intended.
 
 These two files are updated in later phases (see Phase 6 and Phase 7).
 
@@ -95,7 +95,7 @@ Phase 0 — Worktree Isolation (REQUIRED)
 - Must be LOCKED before Phase 1 can begin
 - **All subsequent phases execute in worktree context**
 
-RLM phases are stage-gated. The next phase uses the previous phase’s output as input.
+RLM phases are stage-gated. The next phase uses the previous phase's output as input.
 
 Phase 0 — Requirements (user-created first)
 - Input: chat discussion outside the repo documents
@@ -154,6 +154,7 @@ Phase 3.5 — Code Review (optional)
 Phase 4 - Tests and validation
 - Input: `02-to-be-plan.md` and `03-implementation-summary.md` (plus addenda)
 - Output: `04-test-summary.md`
+- Before running tests, audit the implementation documented in `03-implementation-summary.md` against `00-requirements.md` and `02-to-be-plan.md`; record findings in Phase 4.
 - **TODO Requirement:** Phase artifact MUST include `## TODO` section with checkable items
 - **TODO Enforcement:** ALL TODO items must be checked off before locking
 - **Execution Mode:**
@@ -172,7 +173,7 @@ Phase 6 — Global DECISIONS update
 - Output: update/append `/.codex/DECISIONS.md` with a new run entry that references the run folder docs
 
 Phase 7 — Global STATE update
-- Input: the run’s DECISIONS entry
+- Input: the run's DECISIONS entry
 - Output: update `/.codex/STATE.md` to reflect the current state after the change
 
 ## RLM prompt contract (how users should invoke phases)
@@ -186,7 +187,7 @@ RLM prompts must be concise and path-based. A good prompt:
 
 Example prompt pattern:
 
-“Run RLM Phase 2. Input: `/.codex/rlm/<run-id>/01-as-is.md` (and addenda). Output: `/.codex/rlm/<run-id>/02-to-be-plan.md` as an ExecPlan per `/.agent/PLANS.md`. Enforce Coverage and Approval gates. Do not paste requirements into the prompt; only reference repo files.”
+"Run RLM Phase 2. Input: `/.codex/rlm/<run-id>/01-as-is.md` (and addenda). Output: `/.codex/rlm/<run-id>/02-to-be-plan.md` as an ExecPlan per `/.agent/PLANS.md`. Enforce Coverage and Approval gates. Do not paste requirements into the prompt; only reference repo files."
 
 ## Required structure for every RLM phase artifact (headers + gates)
 
@@ -281,7 +282,7 @@ that contains its own hash.
 
 #### Preferred: use the verifier script
 
-Use `scripts/verify-locks.ps1` to verify and (optionally) fix mismatched hashes.
+Use `scripts/verify-locks.py` (cross-platform) or `scripts/verify-locks.ps1` (PowerShell) to verify and (optionally) fix mismatched hashes.
 
 #### Manual computation examples
 
@@ -341,14 +342,14 @@ The upstream-gap addendum must:
 - state the implications for the current and later phases,
 - state how the current phase compensates (tests added, plan deviation recorded, etc.).
 
-### Mandatory “effective input” read rule
+### Mandatory "effective input" read rule
 
 When a phase declares an input artifact (for example `01-as-is.md`), the agent must treat the effective input as:
 
 - the base file, plus
 - all matching stage-local addenda in lexical order.
 
-The agent must explicitly list all input addenda in the output artifact’s header under Inputs.
+The agent must explicitly list all input addenda in the output artifact's header under Inputs.
 
 ### Addenda locking
 
@@ -371,7 +372,7 @@ RLM coverage must be mechanical. The Phase 0 requirements document must define s
 
 ### Downstream traceability rule
 
-Every downstream artifact must include a short “Traceability” section that maps each R# to where it is addressed and what evidence exists.
+Every downstream artifact must include a short "Traceability" section that maps each R# to where it is addressed and what evidence exists.
 
 - In analysis and plan phases, evidence may be code pointers, planned tests, and described verification steps.
 - In implementation and validation phases, evidence should be concrete: file paths, diffs, logs, test results, and runtime observations.
@@ -414,7 +415,7 @@ Phase 2 — `02-to-be-plan.md` (ExecPlan-grade)
 
 ## Large requirements: Implementation sub-phases (required when scope is large or risky)
 
-Some requirements are too large or risky to implement safely as a single “Phase 3 then Phase 5” blob. In these cases, the work must be decomposed into ordered sub-phases. Each sub-phase has its own implementation steps, an implementation checklist, and an explicit set of tests that must be run and pass before proceeding.
+Some requirements are too large or risky to implement safely as a single "Phase 3 then Phase 5" blob. In these cases, the work must be decomposed into ordered sub-phases. Each sub-phase has its own implementation steps, an implementation checklist, and an explicit set of tests that must be run and pass before proceeding.
 
 This is not a new top-level RLM phase. Sub-phases are a required structure inside Phase 2 planning and Phase 3/5 execution.
 
@@ -433,7 +434,7 @@ If sub-phases are not used for a large change, the Phase 2 Approval Gate must be
 
 When sub-phases are used, `02-to-be-plan.md` must include a section titled:
 
-“Implementation Sub-phases”
+"Implementation Sub-phases"
 
 Under it, define sub-phases as `SP1`, `SP2`, … in order. Each sub-phase must include:
 
@@ -451,7 +452,7 @@ Under it, define sub-phases as `SP1`, `SP2`, … in order. Each sub-phase must i
 - Include Playwright scope rules:
   - Prefer a fast Tier A run for the sub-phase (new/changed tests + `@smoke` if applicable).
   - Specify any tags to use (e.g., `@rlm:<run-id>`, `@smoke`).
-- State pass criteria (what “green” means).
+- State pass criteria (what "green" means).
 
 4) Sub-phase acceptance (mandatory)
 - Observable behavior a human can verify for this increment (even if the requirement is not fully complete yet).
@@ -475,13 +476,13 @@ For each sub-phase SPk:
    - Iterate on implementation (and tests, if the plan requires test additions) until SPk tests pass.
 4) Only after SPk tests pass may the agent proceed to SP(k+1).
 
-This rule is non-negotiable. The agent must not “finish implementation first and test later” when sub-phases are defined.
+This rule is non-negotiable. The agent must not "finish implementation first and test later" when sub-phases are defined.
 
 ### How to record progress and evidence (Phase 3 and Phase 4 artifacts)
 
 Phase 3 output (`03-implementation-summary.md`) must include a section:
 
-“Sub-phase Implementation Summary”
+"Sub-phase Implementation Summary"
 
 For each SPk, record:
 - files touched (paths),
@@ -494,13 +495,13 @@ Phase 4 output (`04-test-summary.md`) must be organized by sub-phase when sub-ph
 - SP2: commands executed + results + artifact paths
 - …
 
-The Phase 4 Approval Gate must be FAIL unless every sub-phase’s required tests have been executed and are passing (or an explicit decision with mitigation is recorded, and the requirement’s constraints allow it).
+The Phase 4 Approval Gate must be FAIL unless every sub-phase's required tests have been executed and are passing (or an explicit decision with mitigation is recorded, and the requirement's constraints allow it).
 
 ### Plan amendments during implementation (without editing locked Phase 2)
 
 Phase 2 artifacts are locked before Phase 3 begins. If, during Phase 3/5, the agent discovers that the locked plan is missing steps, missing tests, incorrect assumptions, or requires sequencing changes, the agent must not edit the locked `02-to-be-plan.md`.
 
-Instead, the agent must create a current-phase upstream-gap addendum that functions as a “plan amendment” for the remaining work.
+Instead, the agent must create a current-phase upstream-gap addendum that functions as a "plan amendment" for the remaining work.
 
 - Addendum location: `/rlm/<run-id>/addenda/`
 - Naming (examples):
@@ -534,7 +535,7 @@ If the repository maintains a smoke tier, critical-path guardrail tests must als
 
 - `@smoke`
 
-These tags may be applied at the `test.describe()` level or on individual tests, but they must be queryable via Playwright’s `--grep` or equivalent mechanism used by the repository.
+These tags may be applied at the `test.describe()` level or on individual tests, but they must be queryable via Playwright's `--grep` or equivalent mechanism used by the repository.
 
 ### Tagging examples (informative)
 
@@ -588,7 +589,7 @@ To keep RLM runs discoverable, reviewable, and fast to validate per sub-phase, P
 
 ### Respect existing repository conventions first (non-negotiable)
 
-Before creating new Playwright tests or moving existing ones, the agent must determine the repository’s current Playwright layout by inspecting:
+Before creating new Playwright tests or moving existing ones, the agent must determine the repository's current Playwright layout by inspecting:
 
 - Playwright config (e.g., `playwright.config.ts` / `.js`) for `testDir`, and
 - package scripts that run Playwright (e.g., `package.json` scripts).
@@ -626,7 +627,7 @@ If the repo uses a different extension or suffix (e.g., `.test.ts`), match the r
 
 ### Test title and tag placement (required)
 
-Tests must include tags in a way that is grep-able via the repo’s chosen Playwright filtering mechanism (typically `--grep`).
+Tests must include tags in a way that is grep-able via the repo's chosen Playwright filtering mechanism (typically `--grep`).
 
 Preferred pattern (apply tags at the `test.describe()` level):
 
@@ -659,7 +660,7 @@ Recommended pattern (adapt to repo conventions):
 
 - `<playwright-test-dir>/fixtures/rlm/<run-id>/...`
 
-If the repo already has a fixtures convention, follow it. Any new fixtures directories must be recorded in the Phase 2 plan and listed in Phase 4’s touched files.
+If the repo already has a fixtures convention, follow it. Any new fixtures directories must be recorded in the Phase 2 plan and listed in Phase 4's touched files.
 
 ### Tier A discovery rule (required)
 
@@ -668,7 +669,7 @@ Tier A for a sub-phase must be able to target the sub-phase tests without manual
 - tags must be present and filterable (preferred), or
 - the plan must specify an equivalent deterministic selection mechanism used by the repo.
 
-If the repo’s Playwright setup cannot reliably filter by tags, the Phase 2 plan must define an alternative (for example, file glob patterns that correspond to `rlm-<run-id>.sp<k>.*`), and must use that alternative consistently throughout Phase 3/5 execution and reporting.
+If the repo's Playwright setup cannot reliably filter by tags, the Phase 2 plan must define an alternative (for example, file glob patterns that correspond to `rlm-<run-id>.sp<k>.*`), and must use that alternative consistently throughout Phase 3/5 execution and reporting.
 
 
 ### Testing discipline (TDD + Playwright) - Phase 2 (TO-BE plan) must include a "Testing Strategy" section that specifies:
@@ -718,7 +719,7 @@ The ExecPlan-grade TO-BE plan (`02-to-be-plan.md`) must include a "Playwright Pl
 2) Tagging strategy for this run:
    - Tests added for the run must be tagged with `@rlm:<run-id>`.
    - If the repository uses a smoke tier, critical-path tests must also be tagged `@smoke`.
-3) Exact commands to run Tier A (fast loop) and Tier B (broader regression), as they apply to this repo’s toolchain.
+3) Exact commands to run Tier A (fast loop) and Tier B (broader regression), as they apply to this repo's toolchain.
 4) How the app is started for E2E (or how requests are stubbed):
    - If a dev server is required, specify the exact start command, base URL, and readiness condition.
    - If stubbing network calls is required, specify what is stubbed and why.
@@ -730,7 +731,17 @@ The Phase 2 Approval Gate must be FAIL if the plan does not specify the above it
 
 The Phase 4 artifact (`04-test-summary.md`) must be self-sufficient for diagnosing failures. It must contain the following sections in order.
 
-1) Environment
+1) Pre-test implementation audit
+
+Before any test commands are executed, audit implementation correctness against intent:
+
+- Compare `03-implementation-summary.md` against `00-requirements.md` and record per-requirement status (implemented / partial / missing) with evidence links.
+- Compare `03-implementation-summary.md` against `02-to-be-plan.md` and record per step/sub-phase status (implemented / deviated / missing) with evidence links.
+- For each mismatch, record remediation:
+  - immediate fix in current phase, or
+  - upstream-gap/stage-local addendum path with follow-up action.
+
+2) Environment
 
 Record enough environment detail to reproduce:
 
@@ -740,18 +751,18 @@ Record enough environment detail to reproduce:
 - Browser projects executed (e.g., chromium/firefox/webkit) and whether headed/headless
 - Base URL used (if applicable)
 
-2) Commands executed (exact)
+3) Commands executed (exact)
 
 List the exact commands actually executed (copy/paste exact shell lines), including:
 
 - Any build commands
 - Any dev server start command (and whether it ran in a separate terminal/process)
 - Tier A Playwright command(s) executed
-- Tier B Playwright command(s) executed (if required by the run’s constraints)
+- Tier B Playwright command(s) executed (if required by the run's constraints)
 
 If the repo uses scripts (e.g., `test:e2e`), record the script and the underlying Playwright invocation if available.
 
-3) Results summary
+4) Results summary
 
 Provide a compact pass/fail summary:
 
@@ -759,7 +770,7 @@ Provide a compact pass/fail summary:
 - If failures occurred: list failing test titles and file paths
 - Whether failures are deterministic or flaky (based on reruns described below)
 
-4) Debugging artifacts (mandatory to locate)
+5) Debugging artifacts (mandatory to locate)
 
 The summary must state exactly where artifacts were written in this repo and how to open them.
 
@@ -773,7 +784,7 @@ At minimum, record paths for:
 
 If the repository uses a custom Playwright config, explicitly cite the config file path that defines these output locations (e.g., `playwright.config.ts`).
 
-5) Failure diagnosis notes (required when failures exist)
+6) Failure diagnosis notes (required when failures exist)
 
 For each failing test:
 
@@ -782,9 +793,9 @@ For each failing test:
 - The most relevant artifact to inspect (report/trace/screenshot/video path)
 - Any immediate remediation step taken
 
-6) Rerun policy and flake handling (required)
+7) Rerun policy and flake handling (required)
 
-To prevent “green by accident,” Phase 4 must follow this policy:
+To prevent "green by accident," Phase 4 must follow this policy:
 
 - On any Playwright failure, rerun the failing test(s) in isolation at least once.
 - If the failure disappears on rerun, treat it as a potential flake and record:
@@ -810,9 +821,9 @@ Standardize where evidence lives (per run):
   - `evidence/perf/`
   - `evidence/traces/` (if applicable)
 - Phase 4 and Phase 5 artifacts must reference concrete repo-relative paths under `evidence/`.
-- If the repo generates artifacts elsewhere (e.g., Playwright `test-results/`), either configure output to point at the run folder (preferred) or copy/link the relevant files into the run’s `evidence/` directory.
+- If the repo generates artifacts elsewhere (e.g., Playwright `test-results/`), either configure output to point at the run folder (preferred) or copy/link the relevant files into the run's `evidence/` directory.
 
-If the repo’s Playwright configuration does not currently produce these artifacts, the plan may introduce minimal, non-invasive configuration changes to enable them (without changing product behavior). Such changes must be recorded in the Decision Log and reflected in the test summary.
+If the repo's Playwright configuration does not currently produce these artifacts, the plan may introduce minimal, non-invasive configuration changes to enable them (without changing product behavior). Such changes must be recorded in the Decision Log and reflected in the test summary.
 
 #### Phase 4 Approval Gate requirements
 
@@ -1037,7 +1048,7 @@ Every requirement implemented in Phase 3 must follow strict TDD discipline:
 3. Never add behavior during refactor
 4. Document cleanups in Phase 3 artifact
 
-### Common Rationalizations (STOP)
+### Common Process Shortcuts (STOP)
 
 | Excuse | Reality |
 |--------|---------|
@@ -1133,7 +1144,7 @@ NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST
 - Create failing test case
 - Handoff to Phase 2 for planning
 
-### Common Rationalizations (STOP)
+### Common Process Shortcuts (STOP)
 
 | Excuse | Reality |
 |--------|---------|
@@ -1164,10 +1175,11 @@ Every locked artifact includes:
 ### LockHash Computation
 
 The LockHash is a SHA-256 hash of the normalized artifact content at lock time. See
-“How to compute LockHash” above for the canonical normalization rules.
+"How to compute LockHash" above for the canonical normalization rules.
 
 **Preferred:**
-- use `scripts/verify-locks.ps1` for verification (and optional fixing)
+- use `scripts/verify-locks.py` for cross-platform verification (and optional fixing)
+- use `scripts/verify-locks.ps1` when running in PowerShell environments
 
 **PowerShell:**
 ```powershell
@@ -1198,7 +1210,18 @@ A phase artifact is **lock-valid** only when ALL of the following are true:
 
 ### Automated Verification
 
-Use the provided PowerShell script to verify all locks:
+Use the provided verifier scripts to verify all locks:
+
+```bash
+# Verify specific run
+python ./.agents/skills/rlm-workflow/scripts/verify-locks.py --run-id "2026-02-21-feature"
+
+# Scan all runs
+python ./.agents/skills/rlm-workflow/scripts/verify-locks.py
+
+# Fix incorrect hashes (use with caution)
+python ./.agents/skills/rlm-workflow/scripts/verify-locks.py --run-id "2026-02-21-feature" --fix
+```
 
 ```powershell
 # Verify specific run
@@ -1220,7 +1243,7 @@ If LockHash doesn't match the canonical normalized content:
 3. **Line endings changed** (CRLF vs LF)
 
 **Action:**
-- If accidental: Use `verify-locks.ps1 -Fix` to update hash
+- If accidental: Use `verify-locks.py --fix` (or `verify-locks.ps1 -Fix`) to update hash
 - If intentional modification: This is an anti-pattern. Use addenda instead.
 
 ### Phase Transition Lock Chain
@@ -1325,10 +1348,30 @@ Hard gates are marked with <HG> tags and use absolute language:
 - "Exception: None"
 </HG>
 
+### Universal Hard Gates
+
+<HG>
+Do NOT proceed to next phase until:
+- Current phase artifact is complete
+- Coverage Gate: PASS
+- Approval Gate: PASS
+- Status: LOCKED with LockedAt and LockHash
+</HG>
+
+<HG>
+Do NOT edit locked prior-phase artifacts.
+If gap discovered, create addendum in current phase.
+</HG>
+
+<HG>
+Do NOT write implementation code before failing test.
+If code written before test: DELETE IT. Start over.
+</HG>
+
 ### HG-0: Phase 0 (Worktree) Hard Gate
 
 <HG>
-Do NOT proceed to Phase 2 until Phase 0 is LOCKED with:
+Do NOT proceed to Phase 1 or 2 until Phase 0 is LOCKED with:
 - Isolated worktree created
 - Git-ignore verified (if project-local)
 - Clean test baseline confirmed
@@ -1337,7 +1380,7 @@ Do NOT proceed to Phase 2 until Phase 0 is LOCKED with:
 **Exception:** None. Phase 0 is REQUIRED.
 </HG>
 
-### HG-1: Phase 2 -> 3 Hard Gate
+### HG-1: Phase 1 -> 2 Hard Gate
 
 <HG>
 Do NOT create 02-to-be-plan.md until 01-as-is.md is LOCKED with:
@@ -1372,10 +1415,11 @@ Do NOT write implementation code until:
 **Exception:** None. The Iron Law has no exceptions.
 </HG>
 
-### HG-4: Phase 4 -> 6 Hard Gate
+### HG-4: Phase 4 -> 5 Hard Gate
 
 <HG>
 Do NOT proceed to Manual QA until:
+- Implementation audit is documented in Phase 4 artifact (against `00-requirements.md` and `02-to-be-plan.md`)
 - All tests from Phase 3 are passing
 - TDD Compliance is verified
 - Test evidence is documented in Phase 4 artifact
@@ -1452,52 +1496,6 @@ If a hard gate is violated:
 
 ---
 
-## RLM Rationalization Awareness
-
-### The Meta-Problem
-
-Agents are skilled at rationalizing shortcuts. These thoughts mean STOP:
-
-| Thought | Reality |
-|---------|---------|
-| "This requirement is simple" | Simple is where assumptions cause most wasted work |
-| "I already know how it works" | You know how you THINK it works. Verify. |
-| "The phases are overkill" | Phases prevent failures. They're faster than fixing failures. |
-| "I'll document it later" | Later never comes. Document now. |
-| "I'm experienced" | Experience doesn't exempt you from discipline |
-| "This feels productive" | Undisciplined action wastes time. Process prevents thrashing. |
-
-### Full Rationalization Tables
-
-See `references/rationalizations.md` for comprehensive tables including:
-- Universal rationalizations (all phases)
-- Phase 2-6 specific rationalizations
-- TDD-specific rationalizations
-- Debugging-specific rationalizations
-- Locking/immutability rationalizations
-
-### Hard Gates
-
-<HG>
-Do NOT proceed to next phase until:
-- Current phase artifact is complete
-- Coverage Gate: PASS
-- Approval Gate: PASS
-- Status: LOCKED with LockedAt and LockHash
-</HG>
-
-<HG>
-Do NOT edit locked prior-phase artifacts.
-If gap discovered, create addendum in current phase.
-</HG>
-
-<HG>
-Do NOT write implementation code before failing test.
-If code written before test: DELETE IT. Start over.
-</HG>
-
----
-
 ## RLM single-command orchestration ("Implement requirement '<run-id>'")
 
 RLM must be operable via a single short prompt. When the user says:
@@ -1520,7 +1518,7 @@ If the run folder or `00-requirements.md` does not exist, the agent must stop an
 
 ### Phase auto-resume and phase selection
 
-The single-command orchestrator must be idempotent and resumable. On every invocation of “Implement requirement '<run-id>'” the agent must:
+The single-command orchestrator must be idempotent and resumable. On every invocation of "Implement requirement '<run-id>'" the agent must:
 
 1) Determine the current phase by inspecting which phase outputs exist and whether they are LOCKED.
 2) If a phase output exists but is DRAFT (or gates are FAIL), resume that phase and iterate until PASS and then lock.
@@ -1537,7 +1535,7 @@ Phase 5: create `05-manual-qa.md` and obtain user sign-off; then lock it
 Phase 6: update global `/.codex/DECISIONS.md`  
 Phase 7: update global `/.codex/STATE.md`
 
-### Mandatory “effective input” rule (base + addenda)
+### Mandatory "effective input" rule (base + addenda)
 
 Whenever the orchestrator reads a phase input artifact, it must treat the effective input as:
 
@@ -1618,21 +1616,21 @@ Phase 5 requires explicit user sign-off recorded in `05-manual-qa.md`.
 
 Therefore, when the orchestrator reaches Phase 5, it must:
 
-1) Ensure the plan’s QA scenarios are present (from `02-to-be-plan.md` effective content). If missing, create a Phase 5 upstream-gap addendum and include the missing scenarios in `05-manual-qa.md`.
+1) Ensure the plan's QA scenarios are present (from `02-to-be-plan.md` effective content). If missing, create a Phase 5 upstream-gap addendum and include the missing scenarios in `05-manual-qa.md`.
 2) Ask the user to execute the manual QA scenarios and report results.
 3) Stop after writing `05-manual-qa.md` in DRAFT with the scenarios.
 
-On the next invocation of “Implement requirement '<run-id>'”, if the user has provided QA results, the agent must record them into `05-manual-qa.md`, pass gates, lock Phase 5, and proceed to Phase 6 and Phase 7.
+On the next invocation of "Implement requirement '<run-id>'", if the user has provided QA results, the agent must record them into `05-manual-qa.md`, pass gates, lock Phase 5, and proceed to Phase 6 and Phase 7.
 
 ### Locking rules for single-command execution
 
-Within a phase, the agent may iterate on that phase’s output artifact and create phase-local addenda. Once both gates are PASS for a phase, the agent must set Status to LOCKED and record LockedAt and LockHash.
+Within a phase, the agent may iterate on that phase's output artifact and create phase-local addenda. Once both gates are PASS for a phase, the agent must set Status to LOCKED and record LockedAt and LockHash.
 
-After locking a phase, the orchestrator must not edit that phase’s base artifact or its stage-local addenda.
+After locking a phase, the orchestrator must not edit that phase's base artifact or its stage-local addenda.
 
 ### Addenda integration for single-command execution
 
-If the orchestrator discovers missing or incorrect information in a LOCKED earlier phase, it must not modify that earlier phase. It must create an upstream-gap addendum in the current phase (as defined in the Addenda section) and proceed forward using the current phase’s addendum to compensate.
+If the orchestrator discovers missing or incorrect information in a LOCKED earlier phase, it must not modify that earlier phase. It must create an upstream-gap addendum in the current phase (as defined in the Addenda section) and proceed forward using the current phase's addendum to compensate.
 
 ## RLM operator contract (what the user does)
 
@@ -1653,6 +1651,3 @@ To continue after Manual QA:
 The rlm-workflow skill operationalizes this document's RLM rules during execution.
 Use it for RLM-triggered prompts such as Implement requirement 'run-id' and phase-specific commands.
 <!-- RLM-WORKFLOW-SKILL:END -->
-
-
-

@@ -320,7 +320,7 @@ If you catch yourself thinking:
 
 **ALL of these mean: STOP. Return to Phase 2.**
 
-## Common Rationalizations (STOP)
+## Common Process Shortcuts (STOP)
 
 | Excuse | Reality |
 |--------|---------|
@@ -473,6 +473,5 @@ Based on root cause analysis:
 - **TRIGGERS:** When requirement involves debugging/fixing
 - **OUTPUT:** `01.5-root-cause.md` artifact
 - **NEXT:** Phase 3 (TO-BE Plan) incorporates findings
-
 
 

@@ -207,6 +207,7 @@ function Get-ArtifactRequiredSections {
         )
         "04-test-summary.md" = @(
             "TODO",
+            "Pre-Test Implementation Audit",
             "Environment",
             "Execution Mode",
             "Commands Executed (Exact)",

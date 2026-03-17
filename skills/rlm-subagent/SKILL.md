@@ -92,7 +92,7 @@ ELSE -> Use Sequential Fallback Mode
 ### Phase 3: Parallel Sub-Phase Implementation
 
 **Controller responsibilities:**
-1. Read locked Phase 3 plan once
+1. Read locked Phase 2 TO-BE plan once
 2. Extract all sub-phases (SP1, SP2, SP3...)
 3. Determine dependencies (independent vs sequential)
 4. Dispatch implementer subagent per independent SP
@@ -118,12 +118,16 @@ await Promise.all([
 **Trigger:** After Phase 3 implementation
 **Action:** Dispatch `agents/code-reviewer.md` subagent with:
 - BASE_SHA and HEAD_SHA of changes
-- Phase 3 plan for alignment check
+- Phase 2 TO-BE plan for alignment check
 - Severity classification (Critical/Important/Minor)
 
 **Review loop:** Issues found -> implementer fixes -> re-review
 
 ### Phase 4: Parallel Testing
+
+**Required before dispatching tests:**
+- Audit `03-implementation-summary.md` against `00-requirements.md` and `02-to-be-plan.md`
+- Document mismatches and remediation/addenda in Phase 4 artifact
 
 **Dispatch pattern:**
 ```typescript
@@ -152,7 +156,7 @@ await Promise.all([
 
 **Fallback trigger flow:**
 ```markdown
-**Subagent Check:** ❌ NOT AVAILABLE
+**Subagent Check:** NOT AVAILABLE
 **Reason:** [Tool not found / Platform limitation / User request]
 **Action:** Using SEQUENTIAL fallback mode
 ```
@@ -223,6 +227,11 @@ Follow the process in agents/code-reviewer.md
 
 **Phase 4 artifact must include:**
 ```markdown
+## Pre-Test Implementation Audit
+- Requirements alignment (`00-requirements.md`): [summary + evidence]
+- Plan alignment (`02-to-be-plan.md`): [summary + evidence]
+- Mismatches and remediation/addenda: [details]
+
 ## Execution Mode
 - **Mode:** Parallel / Sequential
 - **Subagents Used:** [names and counts]
@@ -257,6 +266,11 @@ Follow the process in agents/code-reviewer.md
 
 **Phase 4 artifact must include:**
 ```markdown
+## Pre-Test Implementation Audit
+- Requirements alignment (`00-requirements.md`): [summary + evidence]
+- Plan alignment (`02-to-be-plan.md`): [summary + evidence]
+- Mismatches and remediation/addenda: [details]
+
 ## Execution Mode
 - **Mode:** Parallel / Sequential
 - **Test Suites:**
@@ -274,27 +288,25 @@ Follow the process in agents/code-reviewer.md
 
 ```
 Starting Phase 4
-        │
-        ▼
-Subagent available? ──NO──► SEQUENTIAL MODE
-        │                   - Execute SPs sequentially
-        │                   - Extended self-review
-        │                   - Document as sequential
-        │
-       YES
-        │
-        ▼
-3+ independent SPs? ──NO──► SEQUENTIAL MODE
-        │                   - Single sub-phase
-        │                   - No parallelism benefit
-        │
-       YES
-        │
-        ▼
-   PARALLEL MODE
-   - Dispatch implementer per SP
-   - Two-stage review
-   - Integration after all done
+  |
+  v
+Subagent available? --NO--> SEQUENTIAL MODE
+  |                         - Execute SPs sequentially
+  |                         - Extended self-review
+  |                         - Document as sequential
+ YES
+  |
+  v
+3+ independent SPs? --NO--> SEQUENTIAL MODE
+  |                         - Single sub-phase
+  |                         - No parallelism benefit
+ YES
+  |
+  v
+PARALLEL MODE
+- Dispatch implementer per SP
+- Two-stage review
+- Integration after all done
 ```
 
 ## Quality Maintenance
@@ -321,7 +333,7 @@ Subagent available? ──NO──► SEQUENTIAL MODE
 
 **Scenario:** Feature touches API, UI, and database
 
-**Phase 3 plan:**
+**Phase 2 TO-BE plan:**
 ```markdown
 ## Sub-phases
 - SP1: API changes (backend/)

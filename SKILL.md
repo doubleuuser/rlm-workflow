@@ -21,10 +21,10 @@ Implement repository work using the canonical RLM process in `.agent/PLANS.md`, 
 
 Before doing anything else, ensure the repo scaffolding exists and is up to date:
 
-- `.codex/AGENTS.md` contains the RLM Workflow block
-- `.agent/PLANS.md` is upserted from `references/plans-canonical.md`
+- `.codex/AGENTS.md` contains the RLM Workflow block (managed upsert block)
+- `.agent/PLANS.md` contains the canonical workflow block from `references/plans-canonical.md` (managed upsert block)
 - `.codex/rlm/` exists
-- Any other files created by `scripts/install-rlm-workflow.ps1` exist
+- Any other files created by the installer scripts (`scripts/install-rlm-workflow.ps1` or `scripts/install-rlm-workflow.py`) exist
 
 If any are missing/outdated, run:
 
@@ -34,13 +34,21 @@ powershell -ExecutionPolicy Bypass -File ./scripts/install-rlm-workflow.ps1 -Rep
 
 # PowerShell 7+ (pwsh):
 pwsh -NoProfile -File ./scripts/install-rlm-workflow.ps1 -RepoRoot .
+
+# Python (Windows/macOS/Linux):
+python ./scripts/install-rlm-workflow.py --repo-root .
+# or:
+python3 ./scripts/install-rlm-workflow.py --repo-root .
+
+# Bash wrapper (macOS/Linux):
+bash ./scripts/install-rlm-workflow.sh --repo-root .
 ```
 
-If PowerShell execution isn't possible, perform an equivalent manual bootstrap:
+If script execution isn't possible, perform an equivalent manual bootstrap:
 
 - Create missing directories/files listed above
-- Copy/upsert canonical plans from `references/plans-canonical.md` into `.agent/PLANS.md`
-- Upsert the "RLM Workflow Skill" block into `.codex/AGENTS.md`
+- Upsert canonical plans from `references/plans-canonical.md` into `.agent/PLANS.md` using managed markers
+- Upsert the "RLM Workflow Skill" block into `.codex/AGENTS.md` using managed markers
 
 Then continue with the workflow phases.
 
@@ -100,7 +108,7 @@ Then continue with the workflow phases.
 - **If Phase 0 exists:** It must be lock-valid before Phase 1/2 can begin (worktree isolation verified).
 - **If Phase 1.5 exists:** It must be lock-valid before Phase 2 can begin.
 - A prior phase is considered lock-valid only when its base artifact and phase-local addenda are `LOCKED`, include `LockedAt` and `LockHash`, and end with `Coverage: PASS` and `Approval: PASS`.
-- **Lock Verification:** Verify `LockHash` matches SHA-256 of normalized artifact content (LF newlines; `LockHash:` line removed). Use `scripts/verify-locks.ps1` for automated validation.
+- **Lock Verification:** Verify `LockHash` matches SHA-256 of normalized artifact content (LF newlines; `LockHash:` line removed). Use `scripts/verify-locks.py` (cross-platform) or `scripts/verify-locks.ps1` (PowerShell) for automated validation.
 - If any prior phase is not lock-valid, do not create or update later-phase artifacts.
 - Resume the earliest failing phase and repair it until lock-valid, then continue.
 - Never start Phase 6 or 7 unless `05-manual-qa.md` is lock-valid.
@@ -259,6 +267,7 @@ Do NOT lock a phase or proceed to next phase until:
 - [ ] Phase 3.5 artifact written
 
 **Phase 4:**
+- [ ] Pre-test implementation audit completed (Phase 3 summary vs requirements and Phase 2 plan)
 - [ ] Unit tests executed
 - [ ] Integration tests executed
 - [ ] E2E tests executed (Tier A)
@@ -320,12 +329,16 @@ Before setting `Status: LOCKED`:
   - `skills/rlm-worktree/SKILL.md` - Phase 0 worktree isolation
   - `skills/rlm-tdd/SKILL.md` - TDD discipline for Phase 3
   - `skills/rlm-debugging/SKILL.md` - Systematic debugging for Phase 1.5
-  - `references/rationalizations.md` - Common excuse/reality tables
 - Scripts (utilities):
-  - `scripts/verify-locks.ps1` - Automated lock hash verification
-  - `scripts/rlm-init.ps1` - Initialize a new run folder + templates
-  - `scripts/rlm-status.ps1` - Run status + lock chain summary
-  - `scripts/lint-rlm-run.ps1` - Artifact structure + TODO discipline linter
+  - `scripts/install-rlm-workflow.py` - Cross-platform bootstrap/update
+  - `scripts/rlm-init.py` - Initialize a new run folder + templates (cross-platform)
+  - `scripts/rlm-init.ps1` - Initialize a new run folder + templates (PowerShell equivalent)
+  - `scripts/rlm-status.py` - Run status + lock chain summary (cross-platform)
+  - `scripts/rlm-status.ps1` - Run status + lock chain summary (PowerShell equivalent)
+  - `scripts/lint-rlm-run.py` - Artifact structure + TODO discipline linter (cross-platform)
+  - `scripts/lint-rlm-run.ps1` - Artifact structure + TODO discipline linter (PowerShell equivalent)
+  - `scripts/verify-locks.py` - Automated lock hash verification (cross-platform)
+  - `scripts/verify-locks.ps1` - Automated lock hash verification (PowerShell equivalent)
 
 ## Phase Execution Protocol
 
@@ -351,9 +364,8 @@ Always enforce these sections from `.agent/PLANS.md` when applicable:
 - `Large requirements: Implementation sub-phases (required when scope is large or risky)`
 - `Playwright tagging for RLM runs and implementation sub-phases (required)`
 - `Testing discipline (TDD + Playwright)` sections for Phase 2, 4, and 5
-- **- `RLM TDD Discipline (Phase 3)` - RED-GREEN-REFACTOR cycle, The Iron Law**
-- **- `RLM Systematic Debugging (Phase 1.5)` - When and how to use debug mode**
-- **- `RLM Rationalization Awareness` - Common traps and how to avoid them**
+- `RLM TDD Discipline (Phase 3)` - RED-GREEN-REFACTOR cycle, The Iron Law
+- `RLM Systematic Debugging (Phase 1.5)` - When and how to use debug mode
 - `RLM single-command orchestration ("Implement requirement '<run-id>'")`
 - `Run folder resolution`
 - `Phase auto-resume and phase selection`
@@ -427,6 +439,7 @@ Always enforce these sections from `.agent/PLANS.md` when applicable:
    - **Skill:** `skills/rlm-subagent/SKILL.md`
 
 7. Phase 4 (`04-test-summary.md`) - **Parallel Testing**
+   - Before running tests, audit the implementation in `03-implementation-summary.md` against `00-requirements.md` and `02-to-be-plan.md`; document mismatches, addenda, or confirmations.
    - Record concrete validation commands, results, and requirement coverage.
    - Verify TDD compliance: all tests passing that were written in Phase 3.
    - **Parallel Mode:** Dispatch subagents for independent test suites:
@@ -480,23 +493,23 @@ When a requirement involves multiple concerns, use this priority order to determ
 
 ```
 Requirement received
-        │
-        ▼
-Is it a bug fix? ──YES──► Phase 1.5 (Root Cause Analysis)
-        │                      ▼
-        NO              Phase 2 (incorporate findings)
-        │                      ▼
-        ▼              Phase 3 (TDD implementation)
-Phase 1 (AS-IS)              ▼
-        │              Phase 4 (validation)
-        ▼                      ▼
-Phase 2 (TO-BE)         Phase 5 (Manual QA)
-        │                      ▼
-        ▼              Phase 6/7 (global updates)
-Phase 3 (TDD)
-        │
-        ▼
-    [etc]
+  |
+  v
+Is it a bug fix? --YES--> Phase 1.5 (Root Cause Analysis)
+  |                          |
+  NO                         v
+  |                    Phase 2 (incorporate findings)
+  v                          v
+Phase 1 (AS-IS) -------> Phase 3 (TDD implementation)
+  |                          |
+  v                          v
+Phase 2 (TO-BE) -------> Phase 4 (validation)
+  |                          |
+  v                          v
+Phase 3 (TDD) ---------> Phase 5 (Manual QA)
+                             |
+                             v
+                       Phase 6/7 (global updates)
 ```
 
 ### Examples
@@ -516,7 +529,7 @@ Phase 3 (TDD)
 
 ## Hard Gates
 
-Hard gates are non-negotiable checkpoints that MUST be satisfied before proceeding. They prevent rationalization and corner-cutting.
+Hard gates are non-negotiable checkpoints that MUST be satisfied before proceeding.
 
 <HG>
 ### Phase 0 -> 1/2 Hard Gate
@@ -532,7 +545,7 @@ Do NOT proceed to Phase 1 or 2 until:
 </HG>
 
 <HG>
-### Phase 1 -> 3 Hard Gate
+### Phase 1 -> 2 Hard Gate
 
 Do NOT create 02-to-be-plan.md until 01-as-is.md is LOCKED with:
 - Coverage: PASS
@@ -543,7 +556,7 @@ Do NOT create 02-to-be-plan.md until 01-as-is.md is LOCKED with:
 </HG>
 
 <HG>
-### Phase 1.5 -> 3 Hard Gate (Debug Mode)
+### Phase 1.5 -> 2 Hard Gate (Debug Mode)
 
 Do NOT create TO-BE plan until root cause analysis is complete:
 - Phase 1.5 artifact is LOCKED
@@ -567,9 +580,10 @@ Do NOT write implementation code until:
 </HG>
 
 <HG>
-### Phase 4 -> 6 Hard Gate
+### Phase 4 -> 5 Hard Gate
 
 Do NOT proceed to Manual QA until:
+- Implementation audit is documented in Phase 4 artifact (against `00-requirements.md` and `02-to-be-plan.md`)
 - All tests from Phase 3 are passing
 - TDD Compliance is verified
 - Test evidence is documented in Phase 4 artifact
@@ -644,7 +658,7 @@ RLM supports two execution modes for Phase 3 (Implementation) and Phase 4 (Testi
 
 **Fallback trigger flow:**
 ```markdown
-**Subagent Check:** ❌ NOT AVAILABLE
+**Subagent Check:** NOT AVAILABLE
 **Reason:** [Tool not found / Platform limitation / User request]
 **Action:** Using SEQUENTIAL fallback mode
 ```
@@ -711,17 +725,3 @@ Pause only during Phase 5 for explicit user validation/sign-off. Do not pause fo
 - Keep prompts short and path-based; keep substantive requirements and plans in repo documents.
 - Use deterministic, reproducible commands for implementation and validation.
 - If required input is missing, create the minimal current-phase addendum; do not back-edit locked history.
-
-## Rationalization Awareness
-
-When you find yourself thinking "this time is different" or "I can skip this step," **you are rationalizing**.
-
-**Common traps:**
-- "This requirement is simple" -> Simple is where assumptions cause the most wasted work
-- "I already know how it works" -> You know how you THINK it works. Verify with evidence.
-- "I'll document it later" -> Later never comes. Document now.
-- "TDD is overkill for this fix" -> Simple code breaks. The Iron Law has no exceptions.
-
-**Reference:** `references/rationalizations.md` for comprehensive excuse/reality tables.
-
-**Violating the letter of the process is violating the spirit of quality.**

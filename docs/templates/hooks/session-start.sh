@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Optional template — NOT auto-installed by Skills CLI.
+# Optional template - NOT auto-installed by Skills CLI.
 # If your agent/runtime supports hooks, you may wire this up manually.
 #
 # Session Start Hook for RLM Workflow
@@ -25,7 +25,7 @@ PLUGIN_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 SKILL_NAME="rlm-workflow"
 
 echo ""
-echo "📋 RLM Workflow"
+echo "?? RLM Workflow"
 echo "====================="
 echo ""
 
@@ -39,9 +39,9 @@ fi
 
 echo ""
 echo "Available Skills:"
-echo "  • rlm-workflow    - Main workflow orchestration"
-echo "  • rlm-tdd         - TDD discipline for Phase 3"
-echo "  • rlm-debugging   - Systematic debugging for Phase 1.5"
+echo "  - rlm-workflow    - Main workflow orchestration"
+echo "  - rlm-tdd         - TDD discipline for Phase 3"
+echo "  - rlm-debugging   - Systematic debugging for Phase 1.5"
 echo ""
 
 echo "Quick Start:"
@@ -61,7 +61,7 @@ if [ -d ".codex/rlm" ] 2>/dev/null; then
                 run_name=$(basename "$run_dir")
                 if [ -f "$run_dir/00-requirements.md" ]; then
                     status=$(grep "^Status:" "$run_dir/"*.md 2>/dev/null | tail -1 | cut -d: -f2 | tr -d ' ' || echo "UNKNOWN")
-                    echo "  • $run_name - Status: $status"
+                    echo "  - $run_name - Status: $status"
                 fi
             done
             echo ""
@@ -70,9 +70,8 @@ if [ -d ".codex/rlm" ] 2>/dev/null; then
 fi
 
 echo "Documentation:"
-echo "  • Workflow rules: .agent/PLANS.md"
-echo "  • Artifact templates: references/artifact-template.md"
-echo "  • Rationalizations: references/rationalizations.md"
+echo "  - Workflow rules: .agent/PLANS.md"
+echo "  - Artifact templates: references/artifact-template.md"
 echo ""
 
 echo "====================="
@@ -83,5 +82,5 @@ export RLM_WORKFLOW_ROOT="$PLUGIN_ROOT"
 export RLM_WORKFLOW_VERSION="2.0.0"
 
 # Success - hook completed
-echo "✅ RLM Workflow ready"
+echo "[OK] RLM Workflow ready"
 echo ""

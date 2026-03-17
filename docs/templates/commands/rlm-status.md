@@ -11,8 +11,15 @@ Check RLM status: [run-id]
 ## Script (Recommended)
 
 If you have the skill installed, you can run the status utility directly from the project repo root:
+Python is cross-platform; PowerShell commands are equivalent.
 
 ```powershell
+# Python (Windows/macOS/Linux):
+python "<SKILL_DIR>/scripts/rlm-status.py" --repo-root . --run-id "<run-id>"
+python "<SKILL_DIR>/scripts/rlm-status.py" --repo-root .
+python3 "<SKILL_DIR>/scripts/rlm-status.py" --repo-root . --run-id "<run-id>"
+python3 "<SKILL_DIR>/scripts/rlm-status.py" --repo-root .
+
 # Windows PowerShell:
 powershell -ExecutionPolicy Bypass -File "<SKILL_DIR>/scripts/rlm-status.ps1" -RepoRoot . -RunId "<run-id>"
 powershell -ExecutionPolicy Bypass -File "<SKILL_DIR>/scripts/rlm-status.ps1" -RepoRoot .

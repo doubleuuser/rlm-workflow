@@ -15,7 +15,6 @@ This guide is intentionally prescriptive so two different agents produce equival
 ## Table of Contents
 
 - [Quick Start Checklist](#quick-start-checklist)
-- [Rationalization Awareness](#rationalization-awareness)
 - [Required Header (All Artifacts)](#required-header-all-artifacts)
 - [Universal Sections (All Artifacts Except `00-requirements.md`)](#universal-sections-all-artifacts-except-00-requirementsmd)
 - [Evidence Directory (Per Run)](#evidence-directory-per-run)
@@ -49,43 +48,9 @@ This guide is intentionally prescriptive so two different agents produce equival
 6. Write the required header with exact input/output paths.
 7. Write phase-specific content sections from this guide.
 8. Write `Traceability`, `Coverage Gate`, and `Approval Gate`.
-9. **Review Rationalization Awareness: ensure you're not making excuses to skip steps.**
+9. Perform a pre-lock completeness check using this template's required sections and gates.
 10. Verify LockHash matches SHA-256 of content before locking.
 11. Lock only after both gates pass (`Status`, `LockedAt`, `LockHash`).
-
-## Rationalization Awareness
-
-When you find yourself thinking "this is different because..." or "I can skip this step," **you are rationalizing**. The process applies universally.
-
-### Common Rationalization Traps
-
-| If you're thinking... | The reality is... |
-|----------------------|-------------------|
-| "This requirement is simple" | Simple is where assumptions cause the most wasted work |
-| "I already know how it works" | You know how you THINK it works. Verify with evidence |
-| "The plan is just a guideline" | The plan is a commitment. Deviations need documentation |
-| "This is just a simple fix" | Simple code breaks. Follow the full process |
-| "I'll test after confirming it works" | Tests passing immediately prove nothing |
-| "Later/document later/come back later" | Later never comes. Do it now |
-| "I'm experienced, I know what matters" | Experience doesn't exempt you from discipline |
-
-### Full Rationalization Tables
-
-See `references/rationalizations.md` for comprehensive tables covering:
-- Universal rationalizations (all phases)
-- Phase 1-6 specific rationalizations
-- TDD-specific rationalizations
-- Locking/immutability rationalizations
-
-### The Anti-Rationalization Check
-
-Before claiming a gate PASS, verify:
-1. You're not skipping steps because "this time is different"
-2. You're not deferring documentation "for later"
-3. You're not treating the process as optional overhead
-4. You have concrete evidence, not just "I checked"
-
-**Violating the letter of the process is violating the spirit of quality.**
 
 ## Required Header (All Artifacts)
 
@@ -220,7 +185,7 @@ $ git check-ignore -q .worktrees && echo "IGNORED" || echo "NOT IGNORED"
 IGNORED
 ```
 
-**Result:** ✅ Directory is properly ignored
+**Result:** ? Directory is properly ignored
 
 (If NOT ignored: added to .gitignore and committed before proceeding)
 
@@ -246,7 +211,7 @@ HEAD is now at abc1234 Previous commit message
 
 **Original branch:** `main`
 **Action:** Created worktree (default behavior)
-**Isolation:** ✅ Working in isolated worktree
+**Isolation:** ? Working in isolated worktree
 
 (If on main and user insisted: document explicit consent here)
 
@@ -265,7 +230,7 @@ cd .worktrees/<run-id>
 [setup output]
 ```
 
-**Setup status:** ✅ Complete / ❌ Issues noted
+**Setup status:** ? Complete / ? Issues noted
 
 ## Test Baseline Verification
 
@@ -280,7 +245,7 @@ cd .worktrees/<run-id>
 - Failed: [N]
 - Skipped: [N]
 
-**Baseline:** ✅ Clean (all tests passing) / ❌ Pre-existing failures noted
+**Baseline:** ? Clean (all tests passing) / ? Pre-existing failures noted
 
 (If failures exist, document and get explicit consent to proceed)
 
@@ -458,7 +423,7 @@ Required outcome:
 - systematic root cause analysis for bug fixes
 - error analysis, reproduction verification, data flow tracing
 - documented hypothesis testing
-- root cause summary for Phase 3 planning
+- root cause summary for Phase 2 planning
 
 **Use when:** Requirement involves fixing a bug, test failure, or investigating unexpected behavior.
 
@@ -517,7 +482,7 @@ Scope note: This document records systematic debugging process and identified ro
 **Layer 1: [Component]**
 - Input: [data]
 - Output: [data]
-- Status: ✅ Working / ❌ Broken
+- Status: ? Working / ? Broken
 
 **Failure Boundary:** [where it breaks]
 
@@ -761,7 +726,7 @@ Scope note: This document records completed code changes, TDD compliance, and im
 ```
 - Expected failure: [what should fail]
 - Actual failure: [what actually failed]
-- RED verified: ✅ / ❌
+- RED verified: ? / ?
 
 **GREEN Phase** ([ISO8601 timestamp]):
 - Implementation: [minimal change made]
@@ -769,11 +734,11 @@ Scope note: This document records completed code changes, TDD compliance, and im
 [exact command run]
 [test pass output]
 ```
-- GREEN verified: ✅ / ❌
+- GREEN verified: ? / ?
 
 **REFACTOR Phase** ([ISO8601 timestamp]):
 - Cleanups: [description of improvements]
-- All tests still passing: ✅ / ❌
+- All tests still passing: ? / ?
 
 **Final State:** [All tests passing / Issues noted]
 
@@ -783,11 +748,11 @@ Scope note: This document records completed code changes, TDD compliance, and im
 
 **RED Phase** ([ISO8601 timestamp]):
 - Bug reproduced: [evidence]
-- RED verified: ✅ / ❌
+- RED verified: ? / ?
 
 **GREEN Phase** ([ISO8601 timestamp]):
 - Fix applied: [minimal change]
-- GREEN verified: ✅ / ❌
+- GREEN verified: ? / ?
 
 **REFACTOR:** [N/A or description]
 
@@ -821,8 +786,8 @@ Scope note: This document records completed code changes, TDD compliance, and im
 
 - [ ] All requirements (R1..Rn) have implementation
 - [ ] All sub-phases completed
-- **- [ ] TDD Compliance Log complete for all requirements**
-- **- [ ] No production code without preceding failing test**
+- [ ] TDD Compliance Log complete for all requirements
+- [ ] No production code without preceding failing test
 - [ ] Plan deviations documented (if any)
 - [ ] Implementation evidence recorded
 
@@ -831,10 +796,10 @@ Coverage: PASS / FAIL
 
 ## Approval Gate
 
-- [ ] Implementation matches Phase 3 plan (or deviations documented)
+- [ ] Implementation matches Phase 2 TO-BE plan (or deviations documented)
 - [ ] All tests passing
 - [ ] Build/lint clean
-- **- [ ] TDD Iron Law followed (no code before tests)**
+- [ ] TDD Iron Law followed (no code before tests)
 - [ ] Ready for Phase 5
 
 Approval: PASS / FAIL
@@ -843,7 +808,7 @@ Approval: PASS / FAIL
 ## Phase 3.5 Template (`03.5-code-review.md`) - Optional
 
 Required outcome:
-- Independent review of Phase 4 implementation against plan
+- Independent review of Phase 3 implementation against plan
 - Code quality assessment
 - Issue classification (Critical/Important/Minor)
 - Clear verdict (Approved / Changes Required)
@@ -985,6 +950,7 @@ Approval: PASS / FAIL
 ## Phase 4 Template (`04-test-summary.md`)
 
 Required outcome:
+- pre-test implementation audit against requirements and TO-BE plan
 - exact commands executed
 - pass/fail outcomes
 - evidence artifact locations (standardized under `/.codex/rlm/<run-id>/evidence/`)
@@ -1007,6 +973,7 @@ Scope note: This document records test execution evidence and readiness.
 ## TODO
 
 - [ ] Read Phase 2 plan and Phase 3 implementation summary
+- [ ] Audit implementation summary against `00-requirements.md` and `02-to-be-plan.md`
 - [ ] Determine test execution mode (Parallel vs Sequential)
 - [ ] Execute unit tests (document commands and results)
 - [ ] Execute integration tests (document commands and results)
@@ -1017,6 +984,14 @@ Scope note: This document records test execution evidence and readiness.
 - [ ] Verify TDD compliance (all Phase 3 tests passing)
 - [ ] Complete Coverage Gate checklist
 - [ ] Complete Approval Gate checklist
+
+## Pre-Test Implementation Audit
+
+- Requirement alignment (`00-requirements.md`): list each requirement and confirm implemented/not implemented with evidence.
+- Plan alignment (`02-to-be-plan.md`): list planned steps/sub-phases and confirm implemented/not implemented with evidence.
+- Mismatches found:
+  - [ ] None
+  - [ ] Yes (document each mismatch and required addendum or fix before proceeding)
 
 ## Environment
 
@@ -1120,7 +1095,7 @@ Scope note: This document records user-validated QA outcomes and sign-off.
 
 ## TODO
 
-- [ ] Read Phase 3 plan (QA scenarios)
+- [ ] Read Phase 2 plan (QA scenarios)
 - [ ] Present QA scenarios to user
 - [ ] **PAUSE:** Wait for user to execute scenarios
 - [ ] Record observed outcomes for each scenario
@@ -1263,6 +1238,19 @@ Approval: PASS
 Before locking (or when a lock verification fails unexpectedly), lint the run artifacts for required header fields, required section headings, and TODO completion rules:
 
 ```powershell
+# Python (cross-platform):
+python ./.agents/skills/rlm-workflow/scripts/lint-rlm-run.py --run-id "<run-id>"
+# Or, when running from this repo:
+python ./scripts/lint-rlm-run.py --run-id "<run-id>"
+python3 ./.agents/skills/rlm-workflow/scripts/lint-rlm-run.py --run-id "<run-id>"
+python3 ./scripts/lint-rlm-run.py --run-id "<run-id>"
+
+# Treat WARN as FAIL
+python ./.agents/skills/rlm-workflow/scripts/lint-rlm-run.py --run-id "<run-id>" --strict
+python ./scripts/lint-rlm-run.py --run-id "<run-id>" --strict
+python3 ./.agents/skills/rlm-workflow/scripts/lint-rlm-run.py --run-id "<run-id>" --strict
+python3 ./scripts/lint-rlm-run.py --run-id "<run-id>" --strict
+
 # Lint specific run
 .\.agents\skills\rlm-workflow\scripts\lint-rlm-run.ps1 -RunId "<run-id>"
 # Or, when running from this repo:
@@ -1310,6 +1298,22 @@ sed '/^LockHash:/d' .codex/rlm/<run-id>/<artifact>.md | tr -d '\r' | sha256sum
 ### Automated Verification
 
 Use the provided script to verify all locks in a run:
+
+```bash
+# Verify specific run
+python ./.agents/skills/rlm-workflow/scripts/verify-locks.py --run-id "2026-02-21-feature"
+# Or, when running from this repo:
+python ./scripts/verify-locks.py --run-id "2026-02-21-feature"
+python3 ./.agents/skills/rlm-workflow/scripts/verify-locks.py --run-id "2026-02-21-feature"
+python3 ./scripts/verify-locks.py --run-id "2026-02-21-feature"
+
+# Fix incorrect hashes (use with caution)
+python ./.agents/skills/rlm-workflow/scripts/verify-locks.py --run-id "2026-02-21-feature" --fix
+# Or, when running from this repo:
+python ./scripts/verify-locks.py --run-id "2026-02-21-feature" --fix
+python3 ./.agents/skills/rlm-workflow/scripts/verify-locks.py --run-id "2026-02-21-feature" --fix
+python3 ./scripts/verify-locks.py --run-id "2026-02-21-feature" --fix
+```
 
 ```powershell
 # Verify specific run
