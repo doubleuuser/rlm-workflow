@@ -1,4 +1,11 @@
-# RLM Workflow
+# rlm-workflow is now recursive-mode
+
+The new and improved rlm workflow is now available at: [https://github.com/try-works/recursive-mode](https://github.com/try-works/recursive-mode)
+
+For an introduction and docs, please visit: [https://recursive-mode.dev/](https://recursive-mode.dev/introduction)
+
+
+## RLM Workflow
 
 A stage-gated Recursive Language Models (RLM) workflow for AI-assisted software development with strict phase gates, TDD discipline, and systematic debugging.
 
